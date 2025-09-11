@@ -17,12 +17,12 @@ const GoogleCallback: React.FC = () => {
 
     if (error) {
       toast.error('Google sign-in failed');
-      navigate('/signin');
+      navigate('/');
       return;
     }
     if (!code) {
       toast.error('No code returned from Google');
-      navigate('/signin');
+      navigate('/');
       return;
     }
 
@@ -34,7 +34,7 @@ const GoogleCallback: React.FC = () => {
       })
       .catch(() => {
         toast.error('Google login failed');
-        navigate('/signin');
+        navigate('/');
       });
   }, [location.search, dispatch, navigate]);
 

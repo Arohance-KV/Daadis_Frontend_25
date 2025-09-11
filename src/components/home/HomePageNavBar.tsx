@@ -8,7 +8,7 @@ import { CircleHelp,
     //   Loader2,
       LoaderCircle, LogIn, LogOut, LucideHeart,
     //    Settings,
-        ShoppingCart, Store, UserCircle2, X, Rss  } from "lucide-react";
+        ShoppingCart, Store, UserCircle2, Rss  } from "lucide-react";
 import { useEffect, useRef, useState} from "react";
 // import { yellow } from "@mui/material/colors";
 import { Avatar
@@ -16,205 +16,25 @@ import { Avatar
 } from "@mui/material";
 // import { z } from "zod";
 // import { Form, FormControl, FormField, FormItem, FormMessage } from "../ui/form";
-import { GoogleLogin } from "@react-oauth/google";
 // import { useForm } from "react-hook-form";
 // import { zodResolver } from "@hookform/resolvers/zod";
 import { useDispatch, useSelector } from "react-redux";
 import { Squash as Hamburger } from 'hamburger-react';
 import { slide as Menu } from 'react-burger-menu';
-import gsap from "gsap";
-import { googleAuth, login, signup, getProfile, updateProfile, logout, User } from "../../redux1/authSlice";
-import { resetCustomerData, setCustomerData } from "../../redux/slices/websiteSlice";
+import { getProfile, updateProfile, logout, User } from "../../redux1/authSlice";
 // import Cookies from "js-cookie";
 import { Badge } from "../ui/badge";
-import { ICartItem, ICategory, ICustomer, IProduct } from "../../utils/constants";
 // import { updateCart, updateWishList } from "../../utils/utility-functions";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import type { AppDispatch, RootState } from "../../redux1/store";
-import { mergeCart } from "../dashboard/authentication/AuthenticationComponent";
 import { toast } from "sonner";
-import { ToastSuccess } from "../dashboard/productMain/AllProductsTable";
 import { Category } from "../../redux1/categorySlice";
 import { Product } from "../../redux1/productSlice";
 import { CartItem } from "../../redux1/cartSlice";
 import { WishlistItem } from "../../redux1/wishlistSlice";
-
-const closeAuthDialog = () => {
-    gsap.to("#auth-component", {
-        opacity: 0,
-        duration: 0.5,
-        onComplete: () => {
-            gsap.to("#auth-component", {
-                display: "none",
-                duration: 0,
-            });
-        }
-    });
-};
+import { AuthComponent } from "./AuthComponent";
 
 
-export const AuthComponent = () => {
-    const dispatch = useDispatch<AppDispatch>();
-    const [tab, setTab] = useState<"login" | "signup" | "google">("login");
-    const [loginData, setLoginData] = useState({ email: "", password: "" });
-    const [signupData, setSignupData] = useState({
-      firstName: "",
-      lastName: "",
-      email: "",
-      password: "",
-      phoneNumber: "",
-    });
-
-    const clientid = '176323091300-j5h0a0k0kdf54e2k44hcibvkrguqtip2.apps.googleusercontent.com';
-    const redirectUri = 'http://localhost:5173';
-    console.log("Client ID:", clientid);
-    console.log("Redirect URI:", redirectUri);
-    const handleGoogleLogin = () => {
-        const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${encodeURIComponent(clientid)}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=profile email`;
-        window.location.href = googleAuthUrl;
-    };
-    const handleLogin = () => {
-    dispatch(login(loginData))
-      .unwrap()
-      .then(() => {
-        toast.success("Logged in successfully!");
-        closeAuthDialog();
-      })
-      .catch((err) => toast.error(err || "Login failed"));
-  };
-
-  const handleSignup = () => {
-    dispatch(signup(signupData))
-      .unwrap()
-      .then(() => {
-        toast.success("Account created!");
-        closeAuthDialog();
-      })
-      .catch((err) => toast.error(err || "Signup failed"));
-  };
-    
-    return (
-        // <div className={cn(`w-full font-[quicksand] flex justify-center items-center`)}>
-            <div id="auth-component" className="rounded-lg relative shadow-xl sm:m-0 m-8 gap-4 flex flex-col justify-center items-center bg-gray-100 text-center z-[1000] w-[400px] p-[3%]">
-                <Button className="absolute top-4 h-auto rounded-full p-0 right-4" variant={"ghost"} onClick={(e) => {
-                    e.preventDefault();
-                    gsap.to("#auth-component", {
-                        opacity: 0,
-                        duration: 0.5,
-                        onComplete: () => {
-                            gsap.to("#auth-component", {
-                                display: "none",
-                                duration: 0,
-                            });
-                        }
-                    });
-                }} ><X className="w-6 h-6 p-1 border hover:stroke-white hover:bg-yellow-300 transition-all border-yellow-300 stroke-gray-500 rounded-full" /></Button>
-                <div className="flex justify-center gap-4 mb-4">
-                 <Button
-                   variant={tab === "login" ? "default" : "ghost"}
-                   onClick={() => setTab("login")}
-                 >
-                   Login
-                 </Button>
-                 <Button
-                   variant={tab === "signup" ? "default" : "ghost"}
-                   onClick={() => setTab("signup")}
-                 >
-                   Sign Up
-                 </Button>
-                 <Button
-                   variant={tab === "google" ? "default" : "ghost"}
-                   onClick={() => setTab("google")}
-                 >
-                   Google Log in
-                 </Button>
-                </div>
-                {tab === "login" && (
-                  <div className="flex flex-col gap-3">
-                    <input
-                      type="email"
-                      placeholder="Email"
-                      className="border p-2 rounded"
-                      value={loginData.email}
-                      onChange={(e) =>
-                        setLoginData({ ...loginData, email: e.target.value })
-                      }
-                    />
-                    <input
-                      type="password"
-                      placeholder="Password"
-                      className="border p-2 rounded"
-                      value={loginData.password}
-                      onChange={(e) =>
-                        setLoginData({ ...loginData, password: e.target.value })
-                      }
-                    />
-                    <Button onClick={handleLogin}>Login</Button>
-                  </div>
-                )}
-          
-                {tab === "signup" && (
-                  <div className="flex flex-col gap-3">
-                    <input
-                      type="text"
-                      placeholder="First Name"
-                      className="border p-2 rounded"
-                      value={signupData.firstName}
-                      onChange={(e) =>
-                        setSignupData({ ...signupData, firstName: e.target.value })
-                      }
-                    />
-                    <input
-                      type="text"
-                      placeholder="Last Name"
-                      className="border p-2 rounded"
-                      value={signupData.lastName}
-                      onChange={(e) =>
-                        setSignupData({ ...signupData, lastName: e.target.value })
-                      }
-                    />
-                    <input
-                      type="email"
-                      placeholder="Email"
-                      className="border p-2 rounded"
-                      value={signupData.email}
-                      onChange={(e) =>
-                        setSignupData({ ...signupData, email: e.target.value })
-                      }
-                    />
-                    <input
-                      type="password"
-                      placeholder="Password"
-                      className="border p-2 rounded"
-                      value={signupData.password}
-                      onChange={(e) =>
-                        setSignupData({ ...signupData, password: e.target.value })
-                      }
-                    />
-                    <input
-                      type="text"
-                      placeholder="Phone Number"
-                      className="border p-2 rounded"
-                      value={signupData.phoneNumber}
-                      onChange={(e) =>
-                        setSignupData({ ...signupData, phoneNumber: e.target.value })
-                      }
-                    />
-                    <Button onClick={handleSignup}>Sign Up</Button>
-                  </div>
-                )}
-                {tab === "google" && (
-                  <div className="flex justify-center">
-                    <Button onClick={handleGoogleLogin} className="bg-red-500 hover:bg-red-600 text-white">
-                      Continue with Google
-                    </Button>
-                  </div>
-                )}
-                </div>
-            //</div>
-        // {/* </div> */}
-    );
-};
 
 export const HomePageNavBar = () => {
 
@@ -262,7 +82,7 @@ export const HomePageNavBar = () => {
     const [ isProductPageVisible, setIsProductPageVisible ] = useState(false);
     const [ isHamburgerMenuOpen, setIsHamburgerMenuOpen ] = useState(false);
 
-    const [ isLogoutButtonLoading, setIsLogoutButtonLoading ] = useState(false);
+    const [ ] = useState(false);
     const dispatch = useDispatch<AppDispatch>();
     const user = useSelector((state: RootState) => state.auth.user);
     const loading = useSelector((state: RootState) => state.auth.profileLoading);
@@ -303,7 +123,7 @@ export const HomePageNavBar = () => {
     dispatch(logout());
     navigate("/");
   };
-    const [isPopOverOpen, setIsPopOverOpen] = useState(false);
+    const [] = useState(false);
 
     return (
         <div className="z-[100] font-[quicksand] bg-white scroll-smooth w-full top-0 fixed justify-center items-center flex h-14">
@@ -477,9 +297,7 @@ export const HomePageNavBar = () => {
                       </PopoverTrigger>
                       <PopoverContent side="bottom" sideOffset={8} className="p-4 w-64">
                         {!user ? (
-                          <Button onClick={() => {
-                            gsap.to("#auth-component", { display: "flex", opacity: 1, duration: 0.5 });
-                          }}>
+                          <Button onClick={() => navigate('/auth')}>
                             <LogIn className="mr-2" /> Login / Sign Up
                           </Button>
                         ) : loading ? (

@@ -4,20 +4,12 @@ import "./styles/index.css"
 import { Route, RouterProvider, createBrowserRouter, createRoutesFromElements } from "react-router-dom";
 import { App } from "./App";
 // import { ErrorPage } from "./components/Errorpages/Error";
-import { DashboardHome } from "./components/dashboard/DashboardHome";
-import { DashboardFront } from "./components/dashboard/dashboardMain/DashboardFront";
-import { ProductContent } from "./components/dashboard/productMain/ProductContent";
-import { CustomerContent } from "./components/dashboard/customerMain/CustomerContent";
-import { CouponContent } from "./components/dashboard/couponMain/CouponContent";
-import { AnalyticsContent } from "./components/dashboard/analyticsMain/AnalyticsContent";
-import { DeliveryContent } from "./components/dashboard/deliveryMain/DeliveryContent";
-import { MarketingContent } from "./components/dashboard/marketingMain/MarketingContent";
-import { EmailPage } from "./components/dashboard/marketingMain/EmailPage";
+
 // import { LuckyPoints } from "./components/dashboard/marketingMain/LuckyPoints";
-import { BannersPage } from "./components/dashboard/marketingMain/BannersPage";
+
 import { Provider } from "react-redux";
 import { store } from "./redux1/store";
-import { AuthenticationComponent } from "./components/dashboard/authentication/AuthenticationComponent";
+
 import { Toaster } from "./components/ui/sonner";
 import { HomePage } from "./components/home/HomePage";
 import { WishListPage } from "./components/home/WishListPage";
@@ -35,28 +27,12 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 import { SetShipping } from "./components/home/SetShipping";
 import { PaymentSuccess } from "./components/home/PaymentSuccess";
 import  GoogleCallback  from "./components/home/GoogleCallback";
-
+import { AuthComponent } from "./components/home/AuthComponent";
 const router = createBrowserRouter(
     createRoutesFromElements(
         <Route path="/">
-            <Route path="/auth/google/callback" element={<GoogleCallback />} />
-            <Route path="admin">
-                <Route path="" ></Route>
-                <Route path="auth" element={<AuthenticationComponent type={"dashboard"} />} ></Route>
-                <Route path="dashboard" element={<DashboardHome />}>
-                    <Route path="home" element={<DashboardFront />}></Route>
-                    <Route path="products" element={<ProductContent />}></Route>
-                    <Route path="customers" element={<CustomerContent />}></Route>
-                    <Route path="coupons" element={<CouponContent />}></Route>
-                    <Route path="analytics" element={<AnalyticsContent />}></Route>
-                    <Route path="delivery" element={<DeliveryContent />}></Route>
-                    <Route path="marketing" element={<MarketingContent />}>
-                    </Route>
-                    <Route path="marketing/emails" element={<EmailPage />}></Route>
-                    <Route path="marketing/lucky-points"></Route>
-                    <Route path="marketing/banners" element={<BannersPage />}></Route>
-                </Route>
-            </Route>
+            <Route path="auth/google/callback" element={<GoogleCallback />} />
+            <Route path="auth" element={<AuthComponent />} />
             <Route path="" element={<App />}>
                 <Route path="" element={<HomePage />} />
                 <Route path="set-shipping" element={<SetShipping />} />

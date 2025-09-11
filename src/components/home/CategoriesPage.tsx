@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useParams, useNavigate } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { Button } from "../ui/button";
 import { ChevronLeft, Heart, ImageOff, Loader2, ShoppingCart, Trash2, ChevronDown, Menu } from "lucide-react";
 import { cn } from "../../lib/utils";
@@ -7,7 +7,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
 
 import {
-  selectProducts,
   getAllProducts,
   getProductsByCategory,
   Product,
@@ -141,7 +140,6 @@ const ProductCard = ({
 
 export const CategoriesPage = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const navigate = useNavigate();
   const { name } = useParams<{ name: string }>();
 
   const categories = useSelector(selectCategories);

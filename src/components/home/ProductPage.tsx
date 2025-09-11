@@ -1,9 +1,9 @@
 import { ChevronLeft, LucideHeart, LucideImageOff, ShoppingCart, Trash2, Loader2 } from "lucide-react";
-import React ,{ useEffect, useState } from "react";
-import { useNavigate, Link, useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
-import { ToastSuccess, ToastWarning } from "../dashboard/productMain/AllProductsTable"; // Adjust import if needed
-import { Carousel, CarouselApi, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "../ui/carousel";
+import { ToastSuccess } from "../dashboard/productMain/AllProductsTable"; // Adjust import if needed
+import { CarouselApi } from "../ui/carousel";
 import { Button } from "../ui/button";
 import { cn } from "../../lib/utils";
 import { Skeleton } from "../ui/skeleton";
@@ -30,9 +30,9 @@ export const ProductPage = () => {
   const [cartLoading, setCartLoading] = useState(false);
   const [wishLoading, setWishLoading] = useState(false);
 
-  const [api, setApi] = useState<CarouselApi | undefined>(undefined);
-  const [current, setCurrent] = useState(0);
-  const [count, setCount] = useState(0);
+  const [api] = useState<CarouselApi | undefined>(undefined);
+  const [, setCurrent] = useState(0);
+  const [, setCount] = useState(0);
 
   useEffect(() => {
     if (id) {

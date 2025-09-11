@@ -1,4 +1,4 @@
-import { Key, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button } from "../ui/button";
 import { HomePageHeroCarousel } from "./HomePageHeroCarousel";
@@ -10,7 +10,6 @@ import { useNavigate } from "react-router-dom";
 import { Calendar } from "react-feather";
 import { ArrowRight } from "lucide-react";
 import { optimizeCloudinaryUrl } from "../../utils/utility-functions";
-import { toast } from "sonner";
 import {
   Product,
   selectProducts,
@@ -26,9 +25,8 @@ import {
   selectBlogs,
   getAllBlogs,
   selectBlogsLoading,
-  selectBlogsError,
 } from "../../redux1/blogSlice";
-import type { AppDispatch, RootState } from "../../redux1/store";
+import type { AppDispatch } from "../../redux1/store";
 
 // Blog Card component adapted to Blog type
 const HomeBlogCard = ({ blog }: { blog: Blog }) => {
@@ -91,7 +89,6 @@ export const HomePage = () => {
   const products = useSelector(selectProducts);
   const blogs = useSelector(selectBlogs);
   const blogsLoading = useSelector(selectBlogsLoading);
-  const blogsError = useSelector(selectBlogsError);
 
   // Replace this with your actual partner banners or a fallback empty array
   const partnerBanners = [
@@ -101,8 +98,8 @@ export const HomePage = () => {
     { bannerName: "Partner 4", imageUrl: "https://res.cloudinary.com/dmrgscauc/image/upload/v1757518411/Zepto_Logo.svg_xah0vo.png" },
   ];
 
-  const [bannerHeros, setBannerHeros] = useState<Category[]>([]);
-  const [topProducts, setTopProducts] = useState<Product[]>([]);
+  const [, setBannerHeros] = useState<Category[]>([]);
+  const [, setTopProducts] = useState<Product[]>([]);
 
   useEffect(() => {
     dispatch(getAllCategories());

@@ -157,11 +157,11 @@ export const googleAuth = createAsyncThunk<
   AuthResponse,
   GoogleAuthRequest,
   { rejectValue: string }
->('auth/google', async ( code: GoogleAuthRequest, { rejectWithValue }) => {
+>('auth/google', async ( googleData: GoogleAuthRequest, { rejectWithValue }) => {
   try {
     const response = await apiCall('/auth/google', {
       method: 'POST',
-      body: JSON.stringify({ code }),
+      body: JSON.stringify(googleData),
     });
     return response;
   } catch (error) {
@@ -345,7 +345,7 @@ const authSlice = createSlice({
         state.profileLoading = true;
         state.profileError = null;
       })
-      .addCase(getUserById.fulfilled, (state, action) => {
+      .addCase(getUserById.fulfilled, (state) => {
         state.profileLoading = false;
         // Note: This doesn't update the current user, just fetches another user's data
         // You might want to handle this differently based on your use case

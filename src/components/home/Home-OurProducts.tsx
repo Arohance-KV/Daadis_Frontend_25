@@ -5,7 +5,6 @@ import { Button } from "../ui/button";
 import { Skeleton } from "@mui/material";
 import { optimizeCloudinaryUrl } from "../../utils/utility-functions";
 import TiltedCard from "./Home-OurProductsAnimation";
-import { LucideHeart } from "lucide-react";
 
 // Import from Redux slices
 import { 

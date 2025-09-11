@@ -3,15 +3,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../redux1/store";
 import { getAllBlogs, selectBlogs, selectBlogsLoading, selectBlogsError } from "../../redux1/blogSlice";
 import { Button } from "../ui/button";
-import { Plus, X, Calendar, ArrowRight } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Plus, X, Calendar } from "lucide-react";
 import { toast } from "sonner";
-import { optimizeCloudinaryUrl } from "../../utils/utility-functions";
 
 
 export const BlogPage = () => {
     const dispatch = useDispatch<AppDispatch>();
-    const navigate = useNavigate();
 
     const blogs = useSelector((state: RootState) => selectBlogs(state));
     const loading = useSelector((state: RootState) => selectBlogsLoading(state));
@@ -71,7 +68,7 @@ export const BlogPage = () => {
                 ) : blogs.length > 0 ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8 mb-16">
                     {blogs.map((blog) => (
-                      <Blog key={blog._id} blog={blog} />
+                      <blog key={blog._id} blog={blog} />
                     ))}
                   </div>
                 ) : (
