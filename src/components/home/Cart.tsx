@@ -121,9 +121,9 @@ const CartItemComponent: React.FC<CartItemProps> = ({
   };
 
   return (
-    <div className="grid grid-cols-5 gap-4 items-center py-4">
-      {/* Product column */}
-      <div className="col-span-2 flex items-center gap-4">
+    <div className="grid grid-cols-12 gap-4 items-center py-4">
+      {/* Product column - takes more space */}
+      <div className="col-span-6 flex items-center gap-4">
         <div className="relative">
           <img 
             src={product.images?.[0] ?? "/default-image.png"} 
@@ -148,12 +148,12 @@ const CartItemComponent: React.FC<CartItemProps> = ({
       </div>
       
       {/* Price column */}
-      <div className="col-span-1 text-gray-700 text-center">
+      <div className="col-span-2 text-gray-700 text-center">
         ₹{product.price}
       </div>
       
       {/* Quantity column */}
-      <div className="col-span-1 flex items-center gap-2 justify-center">
+      <div className="col-span-2 flex items-center gap-2 justify-center">
         <Button 
           variant="ghost"
           disabled={count <= 1 || isCartUpdating || loadingMinus}
@@ -178,7 +178,7 @@ const CartItemComponent: React.FC<CartItemProps> = ({
       </div>
       
       {/* Total column */}
-      <div className="col-span-1 text-gray-700 text-right font-medium">
+      <div className="col-span-2 text-gray-700 text-right font-medium">
         {isCartUpdating && !loadingMinus && !loadingPlus ? 
           <Loader2 className="animate-spin inline-block w-4 h-4" /> : 
           `₹${product.price * count}`
@@ -434,23 +434,28 @@ export const Cart: React.FC = () => {
   return (
     <div id="cart-page" className="flex font-[quicksand] text-sm items-center min-h-[calc(100vh-56px)] justify-center py-[5%] flex-col w-full mt-14">
       <h1 className="font-[quicksand] mb-[4%] text-xl">Shopping cart</h1>
-      <div className="w-full max-w-4xl px-4">
-      <div className="grid grid-cols-5 gap-4 border-b pb-4 mb-4 font-medium text-gray-700">
-        <div className="col-span-2 mb-4">Product</div>
-        <div className="col-span-1 text-center">Price</div>
-        <div className="col-span-1 text-center">Quantity</div>
-        <div className="col-span-1 text-right">Total</div>
-        {cartItems && (cartItems?.length == 0) && (
-          <p className="text-xl font-[quicksand] w-full text-center py-20 font-bold">
-            Cart empty!!
-          </p>
-        )}
-        <hr className="col-span-5 w-[98%] m-auto mb-4"/>
-        {cartItems?.map((cartItem: any ) => {
-          return (
+      <div className="w-full max-w-6xl px-4">
+        {/* Cart Items Section */}
+        <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
+          {/* Header Row */}
+          <div className="grid grid-cols-12 gap-4 border-b pb-4 mb-4 font-medium text-gray-700">
+            <div className="col-span-6">Product</div>
+            <div className="col-span-2 text-center">Price</div>
+            <div className="col-span-2 text-center">Quantity</div>
+            <div className="col-span-2 text-right">Total</div>
+          </div>
+          
+          {/* Empty Cart Message */}
+          {cartItems && cartItems?.length === 0 && (
+            <div className="text-xl font-[quicksand] w-full text-center py-20 font-bold text-gray-500">
+              Cart empty!!
+            </div>
+          )}
+          
+          {/* Cart Items */}
+          {cartItems?.map((cartItem: any, index: number) => (
             <div key={cartItem._id}>
               <CartItemComponent
-                key={cartItem._id}
                 item={cartItem}
                 userPresent={!!user}
                 dispatch={dispatch}
@@ -458,92 +463,123 @@ export const Cart: React.FC = () => {
                 itemId={cartItem._id}
                 product={typeof cartItem.product === "object" ? (cartItem.product as Product) : {} as Product}
               />
-              <hr className="col-span-5 mx-auto my-3 w-[95%] self-center text-center" />
+              {index < cartItems.length - 1 && (
+                <hr className="my-4 border-gray-200" />
+              )}
             </div>
-          )
-        })}
-    </div>
-    <div>
-      {/* Coupon Section */}
-      <div className="mt-8 mb-6 max-w-md">
-        <label htmlFor="coupon" className="block mb-2 font-medium">Coupon Code</label>
-        <div className="flex gap-2">
-          <input
-            id="coupon"
-            type="text"
-            placeholder="Enter coupon code"
-            className="flex-grow border rounded p-2"
-            value={couponCode}
-            onChange={(e) => setCouponCode(e.target.value)}
-            disabled={discountLoading}
-          />
-          <Button onClick={handleApplyCoupon} disabled={discountLoading}>
-            {discountLoading ? "Applying..." : "Apply"}
-          </Button>
+          ))}
         </div>
-        {discountFetchError && <p className="text-red-600 mt-1">{String(discountFetchError)}</p>}
-          {couponApplied && currentDiscount && (
-            <div className="mt-2 text-green-700 text-sm">
-              {currentDiscount.code} coupon applied: {currentDiscount.discountType === "percentage"
-                ? `${currentDiscount.value}%`
-                : `₹${currentDiscount.value}`} off
-            </div>
-          )}
-      </div>
 
-        {/* Totals Section */}
+        {/* Bottom Section - Coupon and Summary */}
         {cartItems && cartItems.length > 0 && (
-          <div className="max-w-md ml-auto space-y-2 mb-6">
-            <div className="flex justify-between">
-              <span>Subtotal:</span>
-              <span>₹{subtotal.toFixed(2)}</span>
-            </div>
-            {discountAmount > 0 && (
-              <div className="flex justify-between text-green-600">
-                <span>Discount:</span>
-                <span>-₹{discountAmount.toFixed(2)}</span>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Left Column - Coupon Code */}
+            <div className="bg-white rounded-lg shadow-sm border p-6">
+              <label htmlFor="coupon" className="block mb-3 font-medium text-gray-700">Coupon Code</label>
+              <div className="flex gap-3">
+                <input
+                  id="coupon"
+                  type="text"
+                  placeholder="Enter coupon code"
+                  className="flex-grow border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+                  value={couponCode}
+                  onChange={(e) => setCouponCode(e.target.value)}
+                  disabled={discountLoading}
+                />
+                <Button 
+                  onClick={handleApplyCoupon} 
+                  disabled={discountLoading}
+                  className="bg-yellow-500 hover:bg-yellow-600 text-white px-6"
+                >
+                  {discountLoading ? "Applying..." : "Apply"}
+                </Button>
               </div>
-            )}
-            <div className="flex justify-between">
-              <span>Shipping:</span>
-              <span>₹{shippingCharge.toFixed(2)}</span>
+              {discountFetchError && (
+                <p className="text-red-600 mt-2 text-sm">{String(discountFetchError)}</p>
+              )}
+              {couponApplied && currentDiscount && (
+                <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-md">
+                  <p className="text-green-700 text-sm font-medium">
+                    {currentDiscount.code} coupon applied: {currentDiscount.discountType === "percentage"
+                      ? `${currentDiscount.value}%`
+                      : `₹${currentDiscount.value}`} off
+                  </p>
+                </div>
+              )}
             </div>
-            <div className="flex justify-between">
-              <span>GST (18%):</span>
-              <span>₹{gstAmount.toFixed(2)}</span>
+
+            {/* Right Column - Order Summary */}
+            <div className="bg-white rounded-lg shadow-sm border p-6">
+              <h3 className="text-lg font-semibold mb-4 text-gray-800">Order Summary</h3>
+              <div className="space-y-3 mb-4">
+                <div className="flex justify-between text-gray-600">
+                  <span>Subtotal:</span>
+                  <span>₹{subtotal.toFixed(2)}</span>
+                </div>
+                {discountAmount > 0 && (
+                  <div className="flex justify-between text-green-600">
+                    <span>Discount:</span>
+                    <span>-₹{discountAmount.toFixed(2)}</span>
+                  </div>
+                )}
+                <div className="flex justify-between text-gray-600">
+                  <span>Shipping:</span>
+                  <span>₹{shippingCharge.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-gray-600">
+                  <span>GST (18%):</span>
+                  <span>₹{gstAmount.toFixed(2)}</span>
+                </div>
+                <hr className="border-gray-200" />
+                <div className="flex justify-between text-lg font-bold text-gray-800">
+                  <span>Total:</span>
+                  <span>₹{grandTotal.toFixed(2)}</span>
+                </div>
+              </div>
             </div>
-            <div className="flex justify-between text-xl font-bold border-t pt-2">
-              <span>Total:</span>
-              <span>₹{grandTotal.toFixed(2)}</span>
+          </div>
+        )}
+
+        {/* Order Note and Checkout Section */}
+        {cartItems && cartItems.length > 0 && (
+          <div className="mt-8 bg-white rounded-lg shadow-sm border p-6">
+            <div className="max-w-md mx-auto">
+              <label htmlFor="order-note" className="block mb-3 font-medium text-gray-700">
+                Add a note to your order
+              </label>
+              <Textarea 
+                id="order-note"
+                placeholder="Special instructions for your order..."
+                className="resize-none w-full mb-4 focus-visible:ring-yellow-500"
+                value={orderNote}
+                onChange={(e) => setOrderNote(e.target.value)}
+                rows={3}
+              />
+              <p className="text-center text-sm text-gray-500 mb-6">
+                Tax included and shipping calculated at checkout
+              </p>
+              <Button 
+                disabled={checkoutLoading || cartItems.length <= 0} 
+                className="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-3 text-base" 
+                onClick={handleCheckout}
+              >
+                {checkoutLoading ? (
+                  <>
+                    <Loader2 className="animate-spin w-4 h-4 mr-2" />
+                    Processing...
+                  </>
+                ) : (
+                  'Proceed to Checkout'
+                )}
+              </Button>
             </div>
           </div>
         )}
       </div>
-      </div>
-{/* Order Note and Checkout */}
-      {cartItems && cartItems.length > 0 && (
-        <div className="mt-6 px-4 flex items-center font-[quicksand] justify-center gap-4 flex-col max-w-md">
-          <p>Add a note to your order</p>
-          <Textarea 
-            placeholder="Note" 
-            className="resize-none w-full focus-visible:ring-yellow-500"
-            value={orderNote}
-            onChange={(e) => setOrderNote(e.target.value)}
-          />
-          <p className="text-center text-sm text-gray-600">Tax included and shipping calculated at checkout</p>
-          <Button 
-            disabled={checkoutLoading || cartItems.length <= 0} 
-            className="mt-4 bg-yellow-500 hover:bg-yellow-700 w-full" 
-            onClick={handleCheckout}
-          >
-            {checkoutLoading ? <Loader2 className="animate-spin w-4 h-4 mr-2" /> : null}
-            Checkout
-          </Button>
-        </div>
-      )}
     </div>
   );
 };
+
 function fetchProfile(): any {
   throw new Error("Function not implemented.");
 }
