@@ -20,6 +20,7 @@ import {
   clearCart,
   selectUpdateCartLoading,
   selectRemoveCartLoading,
+  applyDiscount,
 } from "../../redux1/cartSlice";
 
 import { Product } from "../../redux1/productSlice";
@@ -41,6 +42,7 @@ import {
   selectDiscountLoading,
   selectDiscountError,
   clearCurrentDiscount,
+  clearAppliedDiscount,
 } from "../../redux1/discountSlice";
 
 interface CartItemProps {
@@ -212,11 +214,11 @@ export const Cart: React.FC = () => {
   const shippingCharge = 10; // Rs 10 fixed
   const gstPercent = 0.18; // 18%
   
-  const subtotal = cartTotals?.total || 0;
-  const discountAmount = localDiscountValue;
-  const calcTotalBeforeTax = subtotal - discountAmount;
-  const gstAmount = (calcTotalBeforeTax + shippingCharge) * gstPercent;
-  const grandTotal = calcTotalBeforeTax + shippingCharge + gstAmount;
+  const subtotal = Math.round(cartTotals?.total || 0);
+  const discountAmount = Math.round(localDiscountValue);
+  const calcTotalBeforeTax = Math.round(subtotal - discountAmount);
+  const gstAmount = Math.round((calcTotalBeforeTax + shippingCharge) * gstPercent);
+  const grandTotal = Math.round(calcTotalBeforeTax + shippingCharge + gstAmount);
 
   useEffect(() => {
     dispatch(fetchCartDetails());
@@ -233,50 +235,65 @@ export const Cart: React.FC = () => {
   }, []);
 
   // Clear discount if couponCode is cleared
-  useEffect(() => {
+  {/*useEffect(() => {
     if (!couponCode.trim()) {
       setLocalDiscountValue(0);
       setCouponApplied(false);
       dispatch(clearCurrentDiscount());
     }
-  }, [couponCode, dispatch]);
+  }, [couponCode, dispatch]);*/}
+
+  const removeDiscountHandler = async () => {
+  try {
+    // Clear the applied discount from the discount slice state
+    dispatch(clearAppliedDiscount());
+    
+    // Clear the coupon input UI state
+    setCouponCode('');
+    //setCouponed(false);
+    
+    // Refresh cart details to sync the cart state without discount
+    await dispatch(fetchCartDetails());
+
+    toast.success("Discount removed successfully.");
+  } catch (error) {
+    toast.error("Failed to remove discount.");
+  }
+};
 
   const handleApplyCoupon = () => {
-    if (!couponCode.trim()) {
-      toast.error("Please enter a coupon code");
-      return;
-    }
-    dispatch(getDiscountByCode(couponCode.trim()))
-      .unwrap()
-      .then((res) => {
-        const discount = res.data;
-        let amount = 0;
-        // Calculate actual discount amount here
-        if (discount.discountType === "percentage") {
-          amount = subtotal * (discount.value / 100);
-          if (discount.maxDiscount) amount = Math.min(amount, discount.maxDiscount);
-        } else if (discount.discountType === "fixed") {
-          amount = discount.value;
-        }
-        // You can handle buyXgetY etc. if needed
-        setLocalDiscountValue(Math.min(subtotal, Math.floor(amount)));
-        setCouponApplied(true);
-        toast.success("Coupon applied!");
-      })
-      .catch((err) => {
-        setLocalDiscountValue(0);
-        setCouponApplied(false);
-        toast.error((err && err.message) || "Invalid coupon code");
-      });
-  };
+  if (!couponCode.trim()) {
+    toast.error("Please enter a coupon code");
+    return;
+  }
+  // 1. Fetch discount info and store it in Redux
+  dispatch(getDiscountByCode(couponCode.trim()))
+    .unwrap()
+    .then(() => {
+      // 2. ON SUCCESS, apply discount to cart
+      dispatch(applyDiscount({ code: couponCode.trim(), type: "coupon" }))
+        .unwrap()
+        .then(() => {
+          setCouponApplied(true);
+          toast.success("Coupon applied!");
+          dispatch(fetchCartDetails());
+        })
+        .catch((err) => {
+          setCouponApplied(false);
+          toast.error((err && err.message) || "Invalid coupon code");
+        });
+    })
+    .catch((err) => {
+      setCouponApplied(false);
+      toast.error((err && err.message) || "Invalid coupon code");
+    });
+};
 
   const defaultAddress = user?.addresses.find((a) => a.isDefault) ?? null;
 
   const handleCheckout = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     console.log("Checkout initiated");
-
-
 
     if (!user) {
       toast.error("Please login to proceed", { icon: <ToastFaliure /> });
@@ -312,6 +329,9 @@ export const Cart: React.FC = () => {
         },
         paymentMethod: "razorpay",
         notes: orderNote,
+        totalAmount: grandTotal,        // Add discounted total here
+        discountAmount: discountAmount, // Optional but recommended
+        couponCode: couponCode,         // Optional, to identify applied discount
       };
       console.log("Order payload:", orderPayload);
       // Create order
@@ -504,6 +524,14 @@ export const Cart: React.FC = () => {
                       ? `${currentDiscount.value}%`
                       : `₹${currentDiscount.value}`} off
                   </p>
+                  <button
+                    type="button"
+                    onClick={removeDiscountHandler}
+                    className="text-red-500 hover:underline text-sm"
+                    aria-label="Remove coupon"
+                  >
+                    Remove
+                  </button>
                 </div>
               )}
             </div>

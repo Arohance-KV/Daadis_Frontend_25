@@ -6,7 +6,7 @@ import { CircleHelp,
     // Eye, EyeOff,
      Headset, HeartCrack, HomeIcon,
     //   Loader2,
-      LoaderCircle, LogIn, LogOut, LucideHeart,
+      LoaderCircle, LogIn, LucideHeart,
     //    Settings,
         ShoppingCart, Store, UserCircle2, Rss  } from "lucide-react";
 import { useEffect, useRef, useState} from "react";
@@ -21,13 +21,12 @@ import { Avatar
 import { useDispatch, useSelector } from "react-redux";
 import { Squash as Hamburger } from 'hamburger-react';
 import { slide as Menu } from 'react-burger-menu';
-import { getProfile, updateProfile, logout, User } from "../../redux1/authSlice";
+import { getProfile, User } from "../../redux1/authSlice";
 // import Cookies from "js-cookie";
 import { Badge } from "../ui/badge";
 // import { updateCart, updateWishList } from "../../utils/utility-functions";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import type { AppDispatch, RootState } from "../../redux1/store";
-import { toast } from "sonner";
 import { Category } from "../../redux1/categorySlice";
 import { Product } from "../../redux1/productSlice";
 import { CartItem } from "../../redux1/cartSlice";
@@ -86,43 +85,11 @@ export const HomePageNavBar = () => {
     const dispatch = useDispatch<AppDispatch>();
     const user = useSelector((state: RootState) => state.auth.user);
     const loading = useSelector((state: RootState) => state.auth.profileLoading);
-    const [editMode, setEditMode] = useState(false);
-    const [form, setForm] = useState({
-      firstName: "",
-      lastName: "",
-      email: "",
-      phoneNumber: "",
-    });
 
     useEffect(() => {
     if (!user) dispatch(getProfile());
   }, [dispatch, user]);
 
-  useEffect(() => {
-    if (user) {
-      setForm({
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
-        phoneNumber: user.phoneNumber,
-      });
-    }
-  }, [user]);
-
-  const handleSave = () => {
-    dispatch(updateProfile(form))
-      .unwrap()
-      .then(() => {
-        toast.success("Profile updated");
-        setEditMode(false);
-      })
-      .catch((err) => toast.error(err || "Update failed"));
-  };
-
-  const handleLogout = () => {
-    dispatch(logout());
-    navigate("/");
-  };
     const [] = useState(false);
 
     return (
@@ -283,82 +250,35 @@ export const HomePageNavBar = () => {
                         {wishlistItems?.length == 0? (<HeartCrack className="transition-all"/>) : (<LucideHeart className="fill-red-500 stroke-red-500 transition-all"/>)}
                         <Badge className="absolute z-0 right-[-25%] top-[-25%] text-[10px] rounded-full px-1 py-0" variant={"secondary"}>{wishlistItems?.length}</Badge>
                     </Link>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button variant="ghost">
-                          {user ? (
-                            <Avatar sx={{ width: 32, height: 32 }}>
-                              {user.firstName.charAt(0)}
-                            </Avatar>
-                          ) : (
+                    
+                    {/* Modified user profile section */}
+                    {!user ? (
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button variant="ghost">
                             <UserCircle2 className="w-8 h-8" />
-                          )}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent side="bottom" sideOffset={8} className="p-4 w-64">
-                        {!user ? (
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent side="bottom" sideOffset={8} className="p-4 w-64">
                           <Button onClick={() => navigate('/auth')}>
                             <LogIn className="mr-2" /> Login / Sign Up
                           </Button>
-                        ) : loading ? (
-                          <LoaderCircle className="animate-spin" />
-                        ) : editMode ? (
-                          <div className="space-y-2">
-                            <input
-                              className="w-full border p-1 rounded"
-                              value={form.firstName}
-                              onChange={(e) =>
-                                setForm({ ...form, firstName: e.target.value })
-                              }
-                            />
-                            <input
-                              className="w-full border p-1 rounded"
-                              value={form.lastName}
-                              onChange={(e) =>
-                                setForm({ ...form, lastName: e.target.value })
-                              }
-                            />
-                            <input
-                              className="w-full border p-1 rounded"
-                              value={form.email}
-                              onChange={(e) => setForm({ ...form, email: e.target.value })}
-                            />
-                            <input
-                              className="w-full border p-1 rounded"
-                              value={form.phoneNumber}
-                              onChange={(e) =>
-                                setForm({ ...form, phoneNumber: e.target.value })
-                              }
-                            />
-                            <div className="flex justify-end gap-2">
-                              <Button variant="ghost" onClick={() => setEditMode(false)}>
-                                Cancel
-                              </Button>
-                              <Button onClick={handleSave}>Save</Button>
-                            </div>
-                            <Button variant="destructive" onClick={handleLogout}>
-                              <LogOut className="mr-2" /> Logout
-                            </Button>
-                          </div>
-                        ) : (
-                          <div className="space-y-2">
-                            <p>
-                              <strong>
-                                {user.firstName} {user.lastName}
-                              </strong>
-                            </p>
-                            <p>{user.email}</p>
-                            <p>{user.phoneNumber}</p>
-                            <Button variant="ghost" onClick={() => setEditMode(true)}>
-                              Edit Profile
-                            </Button>
-                            <Button variant="destructive" onClick={handleLogout}>
-                              <LogOut className="mr-2" /> Logout
-                            </Button>
-                          </div>
-                        )}
-                      </PopoverContent>
-                    </Popover>
+                        </PopoverContent>
+                      </Popover>
+                    ) : loading ? (
+                      <LoaderCircle className="animate-spin" />
+                    ) : (
+                      <Button 
+                        variant="ghost" 
+                        onClick={() => navigate('/profile')}
+                        className="p-2"
+                      >
+                        <Avatar sx={{ width: 32, height: 32 }}>
+                          {user.firstName.charAt(0)}
+                        </Avatar>
+                      </Button>
+                    )}
+
                     <Link to={"/cart"} className="flex gap-4 items-center justify-center relative">
                         <Button className="flex gap-4 items-center justify-center relative">
                             <ShoppingCart />

@@ -27,6 +27,10 @@ export interface AppliedVoucher {
 }
 
 export interface Cart {
+  totals: any;
+  discountType: string;
+  value: number;
+  maxDiscount: any;
   _id: string;
   user: string;
   items: CartItem[];

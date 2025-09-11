@@ -55,13 +55,13 @@ const HomeOurProducts = () => {
 
       <div className="mt-8 grid w-full sm:grid-cols-3 grid-cols-1 justify-items-center gap-8 h-full">
         {categoriesLoading || activeCategories.length === 0
-          ? [0, 1, 2].map((number) => (
+          ? [0, 1, 2, 3, 4, 5].map((number) => (
               <div key={number} className="w-[100%] col-span-1 max-w-sm">
                 <Skeleton className="rounded-md w-[100%] aspect-square" />
                 <Skeleton className="w-1/2 mt-2" />
               </div>
             ))
-          : activeCategories.slice(0, 3).map((category: Category) => (
+          : activeCategories.slice(0, 5).map((category: Category) => (
               <div key={category._id} className="w-[100%] col-span-1 max-w-sm">
                 <Link to={`/category/${category._id}`} className="hover:cursor-pointer block">
                   <TiltedCard
