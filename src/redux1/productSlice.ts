@@ -20,6 +20,7 @@ export interface Rating {
 }
 
 export interface Product {
+  product: any;
   _id: string;
   name: string;
   code: string;

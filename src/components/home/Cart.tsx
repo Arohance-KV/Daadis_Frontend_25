@@ -121,66 +121,70 @@ const CartItemComponent: React.FC<CartItemProps> = ({
   };
 
   return (
-    <>
-      <div className="gap-2 sm:gap-4 col-span-2 items-center grid grid-cols-5">
-        <div className="relative col-span-2 flex items-center gap-4">
+    <div className="grid grid-cols-5 gap-4 items-center py-4">
+      {/* Product column */}
+      <div className="col-span-2 flex items-center gap-4">
+        <div className="relative">
           <img 
             src={product.images?.[0] ?? "/default-image.png"} 
-            width={300} 
-            height={300} 
-            className="object-cover sm:w-[300px] rounded-md w-[50px] h-[auto] aspect-square col-span-1" 
-            alt="" 
+            width={56} height={56}
+            className="object-cover rounded-md w-14 h-14"
+            alt={product.name}
           />
           <Button 
-            disabled={isCartUpdating} 
-            className="absolute top-0 translate-x-1/2 -translate-y-1/2 z-10 right-0 h-auto w-auto p-1 rounded-full fill-white bg-red-500 hover:scale-125 transition-all hover:bg-red-500" 
+            disabled={isCartUpdating}
+            className="absolute -top-2 -right-2 h-6 w-6 p-0 rounded-full bg-red-500 hover:bg-red-600 hover:scale-110 transition-all"
             onClick={handleRemove}
           >
             <X className="w-3 h-3" />
           </Button>
-          {isCartUpdating && (
-            <div className="absolute top-0 bottom-0 left-0 right-0 bg-gray-100/50 rounded-md flex justify-center items-center">
-              <Loader2 className="animate-spin stroke-gray-600" />
-            </div>
-          )}
         </div>
-        <div className="flex p-1 sm:p-4 flex-col gap-2 text-sm sm:gap-4 col-span-1">
-          <h4 className="text-gray-600">{product.name}</h4>
+        <div className="flex-1 min-w-0">
+          <h4 className="text-gray-800 font-semibold truncate">{product.name}</h4>
           {product?.weight && (
-            <h4 className="text-gray-600 text-sm">{product.weight.number + product.weight.unit}</h4>
+            <p className="text-gray-600 text-xs">{product.weight.number}{product.weight.unit}</p>
           )}
         </div>
       </div>
-      <div className="col-span-1 text-gray-600 flex p-4">{"₹" + product.price}</div>
-      <div className="sm:p-4 col-span-1 space-x-2">
-        <div className="inline-flex items-center text-xs font-[quicksand] rounded-md justify-between">
-          <Button 
-            variant="ghost" 
-            disabled={count <= 1 || isCartUpdating || loadingMinus} 
-            size={"sm"} 
-            className="sm:w-auto sm:h-auto sm:p-2" 
-            onClick={onMinusClick}
-          >
-            <Minus className="w-3 h-3" />
-          </Button>
-          <p className="w-4 flex items-center text-[8px] sm:text-sm justify-center">
-            {isCartUpdating ? <Loader2 className="animate-spin w-3 h-3" /> : count}
-          </p>
-          <Button 
-            disabled={isCartUpdating || loadingPlus} 
-            variant="ghost" 
-            className="w-1 h-1 sm:w-auto sm:h-auto sm:p-2" 
-            size={"sm"} 
-            onClick={onPlusClick}
-          >
-            <Plus className="w-1 h-1 sm:w-3 sm:h-3" />
-          </Button>
-        </div>
+      
+      {/* Price column */}
+      <div className="col-span-1 text-gray-700 text-center">
+        ₹{product.price}
       </div>
-      <div className="col-span-1 text-gray-600 justify-end flex p-4">
-        {isCartUpdating ? <Loader2 className="animate-spin" /> : "₹" + (product.price * count)}
+      
+      {/* Quantity column */}
+      <div className="col-span-1 flex items-center gap-2 justify-center">
+        <Button 
+          variant="ghost"
+          disabled={count <= 1 || isCartUpdating || loadingMinus}
+          size="sm"
+          className="h-8 w-8 p-0"
+          onClick={onMinusClick}
+        >
+          {loadingMinus ? <Loader2 className="animate-spin w-3 h-3" /> : <Minus className="w-3 h-3" />}
+        </Button>
+        <span className="w-8 text-center font-medium">
+          {isCartUpdating && !loadingMinus && !loadingPlus ? <Loader2 className="animate-spin w-3 h-3 mx-auto" /> : count}
+        </span>
+        <Button 
+          variant="ghost"
+          disabled={isCartUpdating || loadingPlus}
+          size="sm"
+          className="h-8 w-8 p-0"
+          onClick={onPlusClick}
+        >
+          {loadingPlus ? <Loader2 className="animate-spin w-3 h-3" /> : <Plus className="w-3 h-3" />}
+        </Button>
       </div>
-    </>
+      
+      {/* Total column */}
+      <div className="col-span-1 text-gray-700 text-right font-medium">
+        {isCartUpdating && !loadingMinus && !loadingPlus ? 
+          <Loader2 className="animate-spin inline-block w-4 h-4" /> : 
+          `₹${product.price * count}`
+        }
+      </div>
+    </div>
   );
 };
 
@@ -411,7 +415,7 @@ export const Cart: React.FC = () => {
     if (error instanceof Error) {
       toast.error(error.message);
     } else {
-      toast.error("Unknown error during checkout");
+      toast.error("Insufficient Stock!");
     }
     } finally {
       setCheckoutLoading(false);
@@ -428,20 +432,26 @@ export const Cart: React.FC = () => {
   }
 
   return (
-    <div id="cart-page" className="flex font-[quicksand] text-sm items-center min-h-[calc(100vh-56px)] justify-between py-[5%] flex-col w-full mt-14">
+    <div id="cart-page" className="flex font-[quicksand] text-sm items-center min-h-[calc(100vh-56px)] justify-center py-[5%] flex-col w-full mt-14">
       <h1 className="font-[quicksand] mb-[4%] text-xl">Shopping cart</h1>
-      <div className="grid grid-cols-5 px-3 sm:p-6 sm:w-[60%]">
-        <div className="col-span-2 mb-4">Product</div>
-        <div className="col-span-1">Price</div>
-        <div className="col-span-1">Quantity</div>
-        <div className="col-span-1 justify-self-end">Total</div>
-        {cartItems && (cartItems?.length == 0) && (
-          <p className="text-xl font-[quicksand] w-full col-span-full h-[20vh] flex justify-center items-center font-bold">
+      
+      <div className="w-full max-w-4xl px-4">
+        {/* Header */}
+        <div className="grid grid-cols-5 gap-4 border-b pb-4 mb-4 font-medium text-gray-700">
+          <div className="col-span-2">Product</div>
+          <div className="col-span-1 text-center">Price</div>
+          <div className="col-span-1 text-center">Quantity</div>
+          <div className="col-span-1 text-right">Total</div>
+        </div>
+        
+        {/* Cart Items */}
+        {cartItems && cartItems.length === 0 ? (
+          <div className="text-xl font-[quicksand] w-full text-center py-20 font-bold">
             Cart empty!!
           </p>
         )}
         <hr className="col-span-5 w-[98%] m-auto mb-4"/>
-        {cartItems?.map((cartItem: any ) => {
+        {cartItems?.map((cartItem: any, index: number) => {
           return (
             <div key={cartItem._id}>
               <CartItemComponent
@@ -453,69 +463,93 @@ export const Cart: React.FC = () => {
                 itemId={cartItem._id}
                 product={typeof cartItem.product === "object" ? (cartItem.product as Product) : {} as Product}
               />
-              <hr className="col-span-5 mx-auto my-3 w-[95%] self-center text-center" />
+            ))}
+          </div>
+        )}
+        
+        {/* Coupon Section */}
+        {cartItems && cartItems.length > 0 && (
+          <div className="mt-8 mb-6 max-w-md">
+            <label htmlFor="coupon" className="block mb-2 font-medium">Coupon Code</label>
+            <div className="flex gap-2">
+              <input
+                id="coupon"
+                type="text"
+                placeholder="Enter coupon code"
+                className="flex-grow border rounded p-2"
+                value={couponCode}
+                onChange={(e) => setCouponCode(e.target.value)}
+                disabled={discountLoading}
+              />
+              <Button onClick={handleApplyCoupon} disabled={discountLoading}>
+                {discountLoading ? "Applying..." : "Apply"}
+              </Button>
             </div>
-          )
-        })}
-    </div>
-    <div>
-      {/* Coupon Section */}
-      <div className="mt-6 mb-4">
-        <label htmlFor="coupon" className="block mb-2 font-medium">Coupon Code</label>
-        <div className="flex gap-2">
-          <input
-            id="coupon"
-            type="text"
-            placeholder="Enter coupon code"
-            className="flex-grow border rounded p-2"
-            value={couponCode}
-            onChange={(e) => setCouponCode(e.target.value)}
-            disabled={discountLoading}
-          />
-          <Button onClick={handleApplyCoupon} disabled={discountLoading}>
-            {discountLoading ? "Applying..." : "Apply"}
-          </Button>
-        </div>
-        {discountFetchError && <p className="text-red-600 mt-1">{String(discountFetchError)}</p>}
-          {couponApplied && currentDiscount && (
-            <div className="mt-2 text-green-700 text-sm">
-              {currentDiscount.code} coupon applied: {currentDiscount.discountType === "percentage"
-                ? `${currentDiscount.value}%`
-                : `₹${currentDiscount.value}`} off
-            </div>
-          )}
-      </div>
+            {discountFetchError && <p className="text-red-600 mt-1">{String(discountFetchError)}</p>}
+            {couponApplied && currentDiscount && (
+              <div className="mt-2 text-green-700 text-sm">
+                {currentDiscount.code} coupon applied: {currentDiscount.discountType === "percentage"
+                  ? `${currentDiscount.value}%`
+                  : `₹${currentDiscount.value}`} off
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Totals Section */}
-      <div className="text-right space-y-2 mb-6">
-        <div>Subtotal: ₹{subtotal.toFixed(2)}</div>
-        {discountAmount > 0 && <div>Discount: -₹{discountAmount.toFixed(2)}</div>}
-        <div>Shipping: ₹{shippingCharge.toFixed(2)}</div>
-        <div>GST (18%): ₹{gstAmount.toFixed(2)}</div>
-        <div className="text-xl font-bold">Total: ₹{grandTotal.toFixed(2)}</div>
+        {cartItems && cartItems.length > 0 && (
+          <div className="max-w-md ml-auto space-y-2 mb-6">
+            <div className="flex justify-between">
+              <span>Subtotal:</span>
+              <span>₹{subtotal.toFixed(2)}</span>
+            </div>
+            {discountAmount > 0 && (
+              <div className="flex justify-between text-green-600">
+                <span>Discount:</span>
+                <span>-₹{discountAmount.toFixed(2)}</span>
+              </div>
+            )}
+            <div className="flex justify-between">
+              <span>Shipping:</span>
+              <span>₹{shippingCharge.toFixed(2)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>GST (18%):</span>
+              <span>₹{gstAmount.toFixed(2)}</span>
+            </div>
+            <div className="flex justify-between text-xl font-bold border-t pt-2">
+              <span>Total:</span>
+              <span>₹{grandTotal.toFixed(2)}</span>
+            </div>
+          </div>
+        )}
       </div>
-      </div>
-      <div className="mt-6 sm:px-0 px-4 flex items-center font-[quicksand] justify-center gap-4 flex-col">
-        <p>Add a note to your order</p>
-        <Textarea 
-          placeholder="Note" 
-          className="resize-none sm:w-96 focus-visible:ring-yellow-500"
-          value={orderNote}
-          onChange={(e) => setOrderNote(e.target.value)}
-        />
-        <p className="text-center">Tax included and shipping calculated at checkout</p>
-      </div>
-      <Button 
-        disabled={checkoutLoading || cartItems.length <= 0} 
-        className="mt-4 bg-yellow-500 hover:bg-yellow-700" 
-        onClick={handleCheckout}
-      >
-        {checkoutLoading ? <Loader2 className="animate-spin w-4 h-4 mr-2" /> : null}
-        Checkout
-      </Button>
+      
+      {/* Order Note and Checkout */}
+      {cartItems && cartItems.length > 0 && (
+        <div className="mt-6 px-4 flex items-center font-[quicksand] justify-center gap-4 flex-col max-w-md">
+          <p>Add a note to your order</p>
+          <Textarea 
+            placeholder="Note" 
+            className="resize-none w-full focus-visible:ring-yellow-500"
+            value={orderNote}
+            onChange={(e) => setOrderNote(e.target.value)}
+          />
+          <p className="text-center text-sm text-gray-600">Tax included and shipping calculated at checkout</p>
+          <Button 
+            disabled={checkoutLoading || cartItems.length <= 0} 
+            className="mt-4 bg-yellow-500 hover:bg-yellow-700 w-full" 
+            onClick={handleCheckout}
+          >
+            {checkoutLoading ? <Loader2 className="animate-spin w-4 h-4 mr-2" /> : null}
+            Checkout
+          </Button>
+        </div>
+      )}
     </div>
   );
 };
+
 function fetchProfile(): any {
   throw new Error("Function not implemented.");
 }

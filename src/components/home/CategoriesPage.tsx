@@ -195,6 +195,8 @@ export const CategoriesPage = () => {
     return category?.name ?? "Category";
   };
 
+  const ALL_PRODUCTS_IMAGE_URL = "https://res.cloudinary.com/dmrgscauc/image/upload/v1756883051/banner_ha5rfq.png"; // <-- use your static image URL
+
   return (
     <div className="mt-[56px] font-[quicksand] flex w-full min-h-[calc(100vh-56px)]">
       {/* Desktop Sidebar */}
@@ -294,9 +296,16 @@ export const CategoriesPage = () => {
           <ChevronLeft className="hover:scale-125 transition-all duration-300 mb-4 top-4 left-4" />
         </Link>
 
+        
         {/* Category banner */}
         <div className="mb-6">
-          {categories.find((cat) => cat._id === currentCategory)?.image ? (
+          {currentCategory === "all" ? (
+            <img
+              src={ALL_PRODUCTS_IMAGE_URL}
+              alt="All Products Banner"
+              className="w-full h-80 rounded object-cover"
+            />
+          ) : categories.find((cat) => cat._id === currentCategory)?.image ? (
             <img
               src={categories.find((cat) => cat._id === currentCategory)?.image}
               alt={`${getCategoryName()} Banner`}

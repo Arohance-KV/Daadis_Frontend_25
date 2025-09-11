@@ -157,11 +157,11 @@ export const googleAuth = createAsyncThunk<
   AuthResponse,
   GoogleAuthRequest,
   { rejectValue: string }
->('auth/google', async (googleData: GoogleAuthRequest, { rejectWithValue }) => {
+>('auth/google', async ( code: GoogleAuthRequest, { rejectWithValue }) => {
   try {
     const response = await apiCall('/auth/google', {
       method: 'POST',
-      body: JSON.stringify(googleData),
+      body: JSON.stringify({ code }),
     });
     return response;
   } catch (error) {

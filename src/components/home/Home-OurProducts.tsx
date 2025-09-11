@@ -45,7 +45,7 @@ const HomeOurProducts = () => {
   return (
     <div className="p-10 our-products-section">
       {/* ---------- Our Products (Categories) ---------- */}
-      <h1 className="font-bold relative text-center text-4xl">
+      <h1 className="font-bold relative text-center text-xl">
         Our products
         <Link className="absolute right-0" to={"/category/all"}>
           <Button variant="ghost" className="underline">
@@ -95,7 +95,7 @@ const HomeOurProducts = () => {
 
      {/* ---------- Best Sellers (Top Products) ---------- */}
       <div id="best-sellers-section" className="mt-16 best-sellers-section">
-        <h1 className="font-bold text-4xl mb-8 text-center">Best Sellers</h1>
+        <h1 className="font-bold text-xl mb-8 text-center">Best Sellers</h1>
         <div className="grid sm:grid-cols-3 grid-cols-1 gap-6 justify-items-center">
           {productsLoading || topProducts.length === 0
             ? [0, 1, 2].map((num) => (
@@ -110,13 +110,6 @@ const HomeOurProducts = () => {
                   key={product._id}
                   className="rounded-lg flex flex-col justify-center relative hover:shadow-lg transition w-full max-w-xs"
                 >
-                  {/* Wishlist button */}
-                  <Button
-                    variant="ghost"
-                    className="p-0 m-0 hover:scale-125 absolute top-3 right-3 transition-all duration-150 w-10 h-10 rounded-full"
-                  >
-                    <LucideHeart className="hover:stroke-red-500 stroke-1" />
-                  </Button>
 
                   {/* Product Image */}
                   <Link to={`/product/${product._id}`}>

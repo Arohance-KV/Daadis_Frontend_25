@@ -53,7 +53,7 @@ import  GoogleCallback  from "./components/home/GoogleCallback";
 const router = createBrowserRouter(
     createRoutesFromElements(
         <Route path="/">
-            <Route path="auth/google/callback" element={<GoogleCallback />} />
+            <Route path="/auth/google/callback" element={<GoogleCallback />} />
             <Route path="admin">
                 <Route path="" ></Route>
                 <Route path="auth" element={<AuthenticationComponent type={"dashboard"} />} ></Route>

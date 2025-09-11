@@ -23,7 +23,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Squash as Hamburger } from 'hamburger-react';
 import { slide as Menu } from 'react-burger-menu';
 import gsap from "gsap";
-import { googleAuth, login, signup, getProfile, updateProfile, logout } from "../../redux1/authSlice";
+import { googleAuth, login, signup, getProfile, updateProfile, logout, User } from "../../redux1/authSlice";
 import { resetCustomerData, setCustomerData } from "../../redux/slices/websiteSlice";
 // import Cookies from "js-cookie";
 import { Badge } from "../ui/badge";
@@ -34,6 +34,10 @@ import type { AppDispatch, RootState } from "../../redux1/store";
 import { mergeCart } from "../dashboard/authentication/AuthenticationComponent";
 import { toast } from "sonner";
 import { ToastSuccess } from "../dashboard/productMain/AllProductsTable";
+import { Category } from "../../redux1/categorySlice";
+import { Product } from "../../redux1/productSlice";
+import { CartItem } from "../../redux1/cartSlice";
+import { WishlistItem } from "../../redux1/wishlistSlice";
 
 const closeAuthDialog = () => {
     gsap.to("#auth-component", {
@@ -62,7 +66,7 @@ export const AuthComponent = () => {
     });
 
     const clientid = '176323091300-j5h0a0k0kdf54e2k44hcibvkrguqtip2.apps.googleusercontent.com';
-    const redirectUri = 'http://localhost:5173/auth/google/callback';
+    const redirectUri = 'http://localhost:5173';
     console.log("Client ID:", clientid);
     console.log("Redirect URI:", redirectUri);
     const handleGoogleLogin = () => {
@@ -214,18 +218,44 @@ export const AuthComponent = () => {
 
 export const HomePageNavBar = () => {
 
-    const categories: ICategory[] = useSelector((state: any) => state?.website?.categories);
-    const productDataFromStore: IProduct[] = useSelector((state : any) => state?.website?.productData);
-    const customerData: ICustomer = useSelector((state: any) => state?.website?.customerData);
-    const [ currentWishlist, setCurrentWishList ] = useState<Array<IProduct>>([]);
-    const [ currentCart, setCurrentCart ] = useState<Array<ICartItem>>([]);
-    const productDropMenuRef = useRef(null);
+    const categories = useSelector<RootState, Category[]>(
+      (state) => state.category.categories
+    );
+    const productDataFromStore = useSelector<RootState, Product[]>(
+      (state) => state.product.products
+    );
+    const customerData = useSelector<RootState, User | null>(
+      (state) => state.auth.user
+    );
+    // Select cart items and wishlist items from respective slices
+    const cartItems = useSelector<RootState, CartItem[]>(
+      (state) => state.cart.items
+    );
+    const wishlistItems = useSelector<RootState, WishlistItem[]>(
+      (state) => state.wishlist.items
+    );
+    // Use local state for wishlist and cart count display
+    const [currentWishlist, setCurrentWishList] = useState<Product[]>(
+      wishlistItems?.map((item) => {
+        // item.product can be a string or object, handle both cases, if only productId string is stored,
+        // map to product data if needed or leave placeholder
+        if (typeof item.product === "object") return item.product as Product;
+        return null; // or map from productDataFromStore by id if possible
+      }).filter(Boolean) as Product[]
+    );
+    const [currentCart, setCurrentCart] = useState<CartItem[]>(cartItems || []);
+    const productDropMenuRef = useRef<HTMLDivElement | null>(null);
     const navigate = useNavigate();
 
     useEffect(() => {
-        setCurrentWishList(customerData?._id ? customerData?.wishList : JSON.parse(localStorage.getItem("wishList")!));
-        setCurrentCart(customerData?._id ? customerData?.cart : JSON.parse(localStorage.getItem("cart")!));
-    }, [customerData])
+    // Update current wishlist and cart from redux state on changes
+    setCurrentWishList(
+      wishlistItems?.map((item) =>
+        typeof item.product === "object" ? (item.product as Product) : null
+      ).filter(Boolean) as Product[]
+    );
+    setCurrentCart(cartItems || []);
+  }, [wishlistItems, cartItems]);
 
     console.log(currentCart, currentWishlist, currentCart?.length, currentWishlist?.length)
 
@@ -309,23 +339,23 @@ export const HomePageNavBar = () => {
                 onMouseEnter={() => setIsProductPageVisible(true)}
                 onMouseLeave={() => setIsProductPageVisible(false)}
             >
-                {categories?.map((category: ICategory, categoryIndex: number) => {
+                {categories?.map((category, categoryIndex) => {
                     return (
                         <div key={categoryIndex} className="text-left min-w-[180px]">
                             <span className="capitalize font-bold text-gray-800 text-sm mb-2 block border-b border-gray-200 pb-1">
-                                {category?.categoryName}
+                                {category.name}
                             </span>
                             <ul className="space-y-1">
                                 {productDataFromStore
-                                    ?.filter((product: IProduct) => product.productCategory.categoryName === category.categoryName)
-                                    ?.map((product: IProduct, productIndex: number) => (
+                                    ?.filter((product) => product.category === category._id)
+                                    ?.map((product, productIndex) => (
                                         <li key={productIndex}>
                                             <Link 
-                                                to={`/product/${product?.productId}`} 
+                                                to={`/product/${product._id}`} 
                                                 className="text-gray-600 hover:text-gray-800 text-xs transition-colors duration-150 hover:bg-gray-50 block py-1 px-2 rounded"
                                                 onClick={() => setIsProductPageVisible(false)}
                                             >
-                                                {product.productName}
+                                                {product.name}
                                             </Link>
                                         </li>
                                     ))
@@ -430,8 +460,8 @@ export const HomePageNavBar = () => {
                     <Link to={"/wishlist"} onClick={() => {
                         {console.log(customerData)}
                     }} className="transition-all z-[0] hover:scale-125 duration-250 hover:fill-red-500 relative">
-                        {(currentWishlist?.length == 0 || currentWishlist == undefined) ?  <HeartCrack className="transition-all"/> : <LucideHeart className="fill-red-500 stroke-red-500 transition-all"/>}
-                        <Badge className="absolute z-0 right-[-25%] top-[-25%] text-[10px] rounded-full px-1 py-0" variant={"secondary"}>{currentWishlist?.length}</Badge>
+                        {wishlistItems?.length == 0? (<HeartCrack className="transition-all"/>) : (<LucideHeart className="fill-red-500 stroke-red-500 transition-all"/>)}
+                        <Badge className="absolute z-0 right-[-25%] top-[-25%] text-[10px] rounded-full px-1 py-0" variant={"secondary"}>{wishlistItems?.length}</Badge>
                     </Link>
                     <Popover>
                       <PopoverTrigger asChild>

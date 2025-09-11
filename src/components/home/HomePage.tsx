@@ -142,7 +142,7 @@ export const HomePage = () => {
 
       {/* Partners */}
       <div className="p-10">
-        <h1 className="text-center font-bold text-4xl mb-8">Our partners</h1>
+        <h1 className="text-center font-bold text-xl mb-8">Our partners</h1>
         <Marquee className="overflow-hidden" pauseOnHover={true} speed={50}>
           {partnerBanners.length > 0 ? (
             partnerBanners.map((banner, index) => (
@@ -170,7 +170,7 @@ export const HomePage = () => {
       {/* Responsive Videos */}
       {/* ... your video section unchanged ... */}
       <div className="w-full p-4 md:p-10 home-page-carousel-container">
-       <h1 className="font-bold text-4xl mb-6 md:mb-8 flex justify-center items-center relative">
+       <h1 className="font-bold text-xl mb-6 md:mb-8 flex justify-center items-center relative">
          From the gram
        </h1>
        
@@ -244,10 +244,6 @@ export const HomePage = () => {
           </div>
           
           {blogsLoading && <p>Loading blog posts...</p>}
-          {blogsError && (
-            <p className="text-red-600">Error loading blogs: {blogsError}</p>
-          )}
-
           {blogs.length > 0 ? (
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
               <div className="lg:col-span-6">

@@ -1,5 +1,5 @@
 import { ChevronLeft, LucideHeart, LucideImageOff, ShoppingCart, Trash2, Loader2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import React ,{ useEffect, useState } from "react";
 import { useNavigate, Link, useParams } from "react-router-dom";
 import { toast } from "sonner";
 import { ToastSuccess, ToastWarning } from "../dashboard/productMain/AllProductsTable"; // Adjust import if needed
@@ -18,12 +18,13 @@ export const ProductPage = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
-
+  ;
   const loading = useSelector(selectProductLoading);
   const productData = useSelector(selectCurrentProduct);
   const cartItems = useSelector((state: RootState) => state.cart.items);
   const wishlistItems = useSelector((state: RootState) => state.wishlist.items);
-
+  const images = productData?.images ?? [];
+  const [selectedIndex, setSelectedIndex] = useState(0)
   const [isInWishlist, setIsInWishlist] = useState(false);
   const [isInCart, setIsInCart] = useState(false);
   const [cartLoading, setCartLoading] = useState(false);
@@ -55,6 +56,11 @@ export const ProductPage = () => {
     });
   }, [api]);
 
+   useEffect(() => {
+    // Reset selected image if product images or product changes
+    setSelectedIndex(0);
+  }, [productData]);
+
 
   if (loading) {
     return (
@@ -73,34 +79,57 @@ export const ProductPage = () => {
   }
 
 return (
-        <div className="flex flex-col min-h-[calc(100vh-56px)] sm:flex-row w-full mt-14 sm:p-10">
-            <div className="">
-                <div className="w-full sm:py-5">
+        <div className="min-h-[calc(100vh-56px)] w-full mt-14 sm:mt-0 sm:p-10 flex flex-col sm:grid sm:grid-cols-2 sm:gap-[4rem]">
+            <div className="flex flex-col items-center sm:items-start sm:justify-center sm:h-full sm:pl-6">
+                <div className="w-full sm:pb-6">
                     <Button variant={"ghost"} onClick={() => navigate(-1)}><ChevronLeft /></Button>
                 </div>
-                <div id="images" className="sm:ml-8 mt-4 flex sm:w-[450px] flex-col justify-center items-center">
-                    <Carousel setApi={setApi} className="sm:ml-10 w-[60%] rounded-md">
-                        <CarouselContent className="rounded-md">
-                            {productData?.images
-                                ? productData?.images.length === 0
-                                    ? (
-                                        <div className="bg-gray-300 w-full ml-4 h-full aspect-square flex justify-center gap-4 flex-col items-center rounded-md">
-                                            <LucideImageOff className="" />No product images present
-                                        </div>
-                                    )
-                                    : productData?.images.map((image, idx) => (
-                                        <CarouselItem className="w-full" key={idx}>
-                                            <img src={image} className="rounded-md w-full h-full" alt="" />
-                                        </CarouselItem>
-                                    ))
-                                : <div>Loading</div>
-                            }
-                        </CarouselContent>
-                        {(productData?.images && productData?.images.length > 0) && <CarouselPrevious />}
-                        {(productData?.images && productData?.images.length > 0) && <CarouselNext />}
-                    </Carousel>
+                <div className="flex flex-col items-center w-full sm:px-8">
+                  {/* Main Product Image */}
+                  <div className="w-full flex justify-center mb-4">
+                    {images.length > 0 ? (
+                      <img
+                        src={images[selectedIndex]}
+                        alt={`Product Image ${selectedIndex + 1}`}
+                        className="rounded-md object-contain shadow-lg"
+                        style={{
+                          width: "530px",
+                          height: "420px",
+                          borderRadius: "1rem"
+                        }}
+                      />
+                    ) : (
+                      <div className="bg-gray-300 rounded-md w-[350px] h-[350px] flex justify-center items-center">
+                        <LucideImageOff className="" />No product images present
+                      </div>
+                    )}
+                  </div>
+        
+                  {/* Thumbnail Gallery */}
+                  {images.length > 1 && (
+                    <div className="flex gap-4 justify-center mt-2">
+                      {images.map((imgSrc, idx) => (
+                        <img
+                          key={idx}
+                          src={imgSrc}
+                          alt={`Thumbnail ${idx + 1}`}
+                          onClick={() => setSelectedIndex(idx)}
+                          className={cn(
+                            "h-16 w-16 object-cover cursor-pointer rounded border",
+                            idx === selectedIndex
+                              ? "border-yellow-400 shadow-md"
+                              : "border-gray-200"
+                          )}
+                          style={{
+                            boxShadow: idx === selectedIndex ? "0 0 0 2px #facc15" : undefined
+                          }}
+                        />
+                      ))}
+                    </div>
+                  )}
                 </div>
-            </div>
+              </div>
+            
             <div className="flex gap-10 flex-col sm:mt-32 mt-4 items-center font-[quicksand] flex-1 mx-3">
                 <div id="head" className="flex flex-col h-full gap-2">
                     <h1 className="font-bold text-3xl">{productData?.name ? productData?.name : <Skeleton className="h-8 w-56" />}</h1>
