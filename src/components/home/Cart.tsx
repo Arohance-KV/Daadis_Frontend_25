@@ -415,7 +415,7 @@ export const Cart: React.FC = () => {
     if (error instanceof Error) {
       toast.error(error.message);
     } else {
-      toast.error("Insufficient Stock!");
+      toast.error("Unknown error during checkout");
     }
     } finally {
       setCheckoutLoading(false);
@@ -434,24 +434,19 @@ export const Cart: React.FC = () => {
   return (
     <div id="cart-page" className="flex font-[quicksand] text-sm items-center min-h-[calc(100vh-56px)] justify-center py-[5%] flex-col w-full mt-14">
       <h1 className="font-[quicksand] mb-[4%] text-xl">Shopping cart</h1>
-      
       <div className="w-full max-w-4xl px-4">
-        {/* Header */}
-        <div className="grid grid-cols-5 gap-4 border-b pb-4 mb-4 font-medium text-gray-700">
-          <div className="col-span-2">Product</div>
-          <div className="col-span-1 text-center">Price</div>
-          <div className="col-span-1 text-center">Quantity</div>
-          <div className="col-span-1 text-right">Total</div>
-        </div>
-        
-        {/* Cart Items */}
-        {cartItems && cartItems.length === 0 ? (
-          <div className="text-xl font-[quicksand] w-full text-center py-20 font-bold">
+      <div className="grid grid-cols-5 gap-4 border-b pb-4 mb-4 font-medium text-gray-700">
+        <div className="col-span-2 mb-4">Product</div>
+        <div className="col-span-1 text-center">Price</div>
+        <div className="col-span-1 text-center">Quantity</div>
+        <div className="col-span-1 text-right">Total</div>
+        {cartItems && (cartItems?.length == 0) && (
+          <p className="text-xl font-[quicksand] w-full text-center py-20 font-bold">
             Cart empty!!
           </p>
         )}
         <hr className="col-span-5 w-[98%] m-auto mb-4"/>
-        {cartItems?.map((cartItem: any, index: number) => {
+        {cartItems?.map((cartItem: any ) => {
           return (
             <div key={cartItem._id}>
               <CartItemComponent
@@ -463,38 +458,38 @@ export const Cart: React.FC = () => {
                 itemId={cartItem._id}
                 product={typeof cartItem.product === "object" ? (cartItem.product as Product) : {} as Product}
               />
-            ))}
-          </div>
-        )}
-        
-        {/* Coupon Section */}
-        {cartItems && cartItems.length > 0 && (
-          <div className="mt-8 mb-6 max-w-md">
-            <label htmlFor="coupon" className="block mb-2 font-medium">Coupon Code</label>
-            <div className="flex gap-2">
-              <input
-                id="coupon"
-                type="text"
-                placeholder="Enter coupon code"
-                className="flex-grow border rounded p-2"
-                value={couponCode}
-                onChange={(e) => setCouponCode(e.target.value)}
-                disabled={discountLoading}
-              />
-              <Button onClick={handleApplyCoupon} disabled={discountLoading}>
-                {discountLoading ? "Applying..." : "Apply"}
-              </Button>
+              <hr className="col-span-5 mx-auto my-3 w-[95%] self-center text-center" />
             </div>
-            {discountFetchError && <p className="text-red-600 mt-1">{String(discountFetchError)}</p>}
-            {couponApplied && currentDiscount && (
-              <div className="mt-2 text-green-700 text-sm">
-                {currentDiscount.code} coupon applied: {currentDiscount.discountType === "percentage"
-                  ? `${currentDiscount.value}%`
-                  : `₹${currentDiscount.value}`} off
-              </div>
-            )}
-          </div>
-        )}
+          )
+        })}
+    </div>
+    <div>
+      {/* Coupon Section */}
+      <div className="mt-8 mb-6 max-w-md">
+        <label htmlFor="coupon" className="block mb-2 font-medium">Coupon Code</label>
+        <div className="flex gap-2">
+          <input
+            id="coupon"
+            type="text"
+            placeholder="Enter coupon code"
+            className="flex-grow border rounded p-2"
+            value={couponCode}
+            onChange={(e) => setCouponCode(e.target.value)}
+            disabled={discountLoading}
+          />
+          <Button onClick={handleApplyCoupon} disabled={discountLoading}>
+            {discountLoading ? "Applying..." : "Apply"}
+          </Button>
+        </div>
+        {discountFetchError && <p className="text-red-600 mt-1">{String(discountFetchError)}</p>}
+          {couponApplied && currentDiscount && (
+            <div className="mt-2 text-green-700 text-sm">
+              {currentDiscount.code} coupon applied: {currentDiscount.discountType === "percentage"
+                ? `${currentDiscount.value}%`
+                : `₹${currentDiscount.value}`} off
+            </div>
+          )}
+      </div>
 
         {/* Totals Section */}
         {cartItems && cartItems.length > 0 && (
@@ -524,8 +519,8 @@ export const Cart: React.FC = () => {
           </div>
         )}
       </div>
-      
-      {/* Order Note and Checkout */}
+      </div>
+{/* Order Note and Checkout */}
       {cartItems && cartItems.length > 0 && (
         <div className="mt-6 px-4 flex items-center font-[quicksand] justify-center gap-4 flex-col max-w-md">
           <p>Add a note to your order</p>
@@ -549,7 +544,6 @@ export const Cart: React.FC = () => {
     </div>
   );
 };
-
 function fetchProfile(): any {
   throw new Error("Function not implemented.");
 }
