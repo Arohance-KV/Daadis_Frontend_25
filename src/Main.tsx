@@ -35,20 +35,6 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 import { SetShipping } from "./components/home/SetShipping";
 import { PaymentSuccess } from "./components/home/PaymentSuccess";
 import  GoogleCallback  from "./components/home/GoogleCallback";
-// import { ProductPage } from "./components/home/ProductsPage";
-
-// const router = createBrowserRouter([
-//     {
-//         path: "/",
-//         element: <App/ >,
-//         errorElement: <ErrorPage />
-//     },
-//     {
-//         path: "admin/",
-//         element: <DashboardHome />,
-//         errorElement: <ErrorPage />
-//     }
-// ]);
 
 const router = createBrowserRouter(
     createRoutesFromElements(
