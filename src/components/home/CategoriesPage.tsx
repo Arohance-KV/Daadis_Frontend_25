@@ -49,8 +49,18 @@ const ProductCard = ({
     currentCart.some((item) => item.product._id === product._id)
   );
 
+  // Check if product is out of stock
+  const isOutOfStock = product.stock === 0;
+
   const handleCartToggle = async (e: React.MouseEvent) => {
     e.preventDefault();
+    
+    // Prevent adding to cart if out of stock
+    if (isOutOfStock) {
+      toast.error("Product is out of stock");
+      return;
+    }
+
     setCartLoading(true);
     try {
       if (isInCart) {
@@ -95,24 +105,56 @@ const ProductCard = ({
   };
 
   return (
-    <div className="max-w-[250px] w-full col-span-1 justify-self-center relative rounded-lg shadow-xl">
-      <img
-        src={product.images[0] ?? ""}
-        alt={product.name}
-        className="border-none rounded-t-[inherit] object-cover w-full h-auto aspect-square"
-      />
+    <div className={cn(
+      "max-w-[250px] w-full col-span-1 justify-self-center relative rounded-lg shadow-xl",
+      isOutOfStock && "opacity-75"
+    )}>
+      {/* Product Image with Stock Overlay */}
+      <div className="relative">
+        <img
+          src={product.images[0] ?? ""}
+          alt={product.name}
+          className={cn(
+            "border-none rounded-t-[inherit] object-cover w-full h-auto aspect-square",
+            isOutOfStock && "grayscale"
+          )}
+        />
+        
+        {/* Out of Stock Overlay */}
+        {isOutOfStock && (
+          <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-t-[inherit]">
+            <span className="text-white font-bold text-lg bg-red-500 px-3 py-1 rounded">
+              OUT OF STOCK
+            </span>
+          </div>
+        )}
+      </div>
+
       <div className="w-full flex flex-col gap-2 p-4 h-1/3 rounded-b-[inherit]">
         <h3 className="font-[quicksand] text-xl">{product.name}</h3>
         <h6 className="text-gray-600">{product.weight.number}{product.weight.unit}</h6>
         <h6 className="">₹{product.price}</h6>
+        
+        {/* Stock Status - Only show if out of stock */}
+        {isOutOfStock && (
+          <div className="text-sm">
+            <span className="text-red-500 font-medium">Out of Stock</span>
+          </div>
+        )}
+
         <Button
-          className="flex justify-center items-center gap-4 w-full"
-          variant="ghost"
+          className={cn(
+            "flex justify-center items-center gap-4 w-full",
+            isOutOfStock && "opacity-50 cursor-not-allowed"
+          )}
+          variant={isOutOfStock ? "secondary" : "ghost"}
           onClick={handleCartToggle}
-          disabled={isCartLoading}
+          disabled={isCartLoading || isOutOfStock}
         >
           {isCartLoading ? (
             <Loader2 className="w-4 h-4 animate-spin" />
+          ) : isOutOfStock ? (
+            "Out of Stock"
           ) : isInCart ? (
             "- Remove from cart"
           ) : (
@@ -121,6 +163,7 @@ const ProductCard = ({
           <ShoppingCart />
         </Button>
       </div>
+      
       <button 
         onClick={handleWishToggle}
         className="absolute top-[3%] right-[5%]"
@@ -193,7 +236,7 @@ export const CategoriesPage = () => {
     return category?.name ?? "Category";
   };
 
-  const ALL_PRODUCTS_IMAGE_URL = "https://res.cloudinary.com/dmrgscauc/image/upload/v1756883051/banner_ha5rfq.png"; // <-- use your static image URL
+  const ALL_PRODUCTS_IMAGE_URL = "https://res.cloudinary.com/dmrgscauc/image/upload/v1756883051/banner_ha5rfq.png";
 
   return (
     <div className="mt-[56px] font-[quicksand] flex w-full min-h-[calc(100vh-56px)]">
@@ -325,11 +368,11 @@ export const CategoriesPage = () => {
               <Link key={product._id} to={`/product/${product._id}`} className="block hover:scale-105 transition-transform duration-200">
                 <ProductCard
                   product={product}
-                  currentCart={cartItems} // Pass actual cart data from Redux
+                  currentCart={cartItems}
                   currentWishList={wishlistItems
                     .map(item => allProducts.find(p => p._id === item.product))
                     .filter((p): p is Product => !!p)
-                  } // Map wishlist items to full Product objects
+                  }
                 />
               </Link>
             );

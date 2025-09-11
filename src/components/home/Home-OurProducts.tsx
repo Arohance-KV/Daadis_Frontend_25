@@ -44,9 +44,9 @@ const HomeOurProducts = () => {
   return (
     <div className="p-10 our-products-section">
       {/* ---------- Our Products (Categories) ---------- */}
-      <h1 className="font-bold relative text-center text-xl">
+      <h1 className="font-bold relative text-center text-xl py-4 ">
         Our products
-        <Link className="absolute right-0" to={"/category/all"}>
+        <Link className="absolute right-0 " to={"/category/all"}>
           <Button variant="ghost" className="underline">
             View all
           </Button>
@@ -94,44 +94,45 @@ const HomeOurProducts = () => {
 
      {/* ---------- Best Sellers (Top Products) ---------- */}
       <div id="best-sellers-section" className="mt-16 best-sellers-section">
-        <h1 className="font-bold text-xl mb-8 text-center">Best Sellers</h1>
-        <div className="grid sm:grid-cols-3 grid-cols-1 gap-6 justify-items-center">
-          {productsLoading || topProducts.length === 0
-            ? [0, 1, 2].map((num) => (
-                <div key={num} className="w-[100%] col-span-1 max-w-xs">
-                  <Skeleton className="rounded-md w-[100%] aspect-square" />
-                  <Skeleton className="w-3/4 mt-2" />
-                  <Skeleton className="w-1/2 mt-1" />
-                </div>
-              ))
-            : topProducts.map((product: Product) => (
-                <div
-                  key={product._id}
-                  className="rounded-lg flex flex-col justify-center relative hover:shadow-lg transition w-full max-w-xs"
-                >
-
-                  {/* Product Image */}
-                  <Link to={`/product/${product._id}`}>
-                    <img
-                      className="h-[75%] w-full object-cover rounded-md mb-3"
-                      src={optimizeCloudinaryUrl(product.images?.[0])}
-                      alt={product.name}
-                    />
-                  </Link>
-
-                  {/* Product Info */}
-                  <div className="px-2 text-center">
-                    <span className="font-semibold">{product.name}</span>
-                    <span className="block text-slate-500 text-sm">
-                      {product.weight?.number}
-                      {product.weight?.unit}
-                    </span>
-                    <span className="block font-bold">₹ {product.price}</span>
-                  </div>
-                </div>
-              ))}
-        </div>
-      </div>
+  <h1 className="font-bold text-xl mb-8 text-center">Best Sellers</h1>
+  <div className="grid sm:grid-cols-3 grid-cols-1 gap-6 justify-items-center">
+    {productsLoading || topProducts.length === 0
+      ? [0, 1, 2].map((num) => (
+          <div key={num} className="w-[100%] col-span-1 max-w-xs">
+            <Skeleton className="rounded-md w-[100%] aspect-square" />
+            <Skeleton className="w-3/4 mt-2" />
+            <Skeleton className="w-1/2 mt-1" />
+          </div>
+        ))
+      : topProducts.map((product: Product) => (
+          <div
+            key={product._id}
+            className="rounded-lg flex flex-col h-full relative hover:shadow-lg transition w-full max-w-xs"
+          >
+            {/* Product Image Container - Takes up remaining space */}
+            <div className="flex-grow flex items-center justify-center p-2">
+              <Link to={`/product/${product._id}`} className="block">
+                <img
+                  className="max-w-full max-h-full object-contain rounded-md"
+                  src={optimizeCloudinaryUrl(product.images?.[0])}
+                  alt={product.name}
+                />
+              </Link>
+            </div>
+            
+            {/* Product Info - Always at bottom */}
+            <div className="px-2 text-center mt-3 flex-shrink-0">
+              <span className="font-semibold">{product.name}</span>
+              <span className="block text-slate-500 text-sm">
+                {product.weight?.number}
+                {product.weight?.unit}
+              </span>
+              <span className="block font-bold">₹ {product.price}</span>
+            </div>
+          </div>
+        ))}
+  </div>
+</div>
     </div>
   );
 };

@@ -27,6 +27,8 @@ import {
   selectBlogsLoading,
 } from "../../redux1/blogSlice";
 import type { AppDispatch } from "../../redux1/store";
+import OurPartners from "./Home-OurPartners";
+
 
 // Blog Card component adapted to Blog type
 const HomeBlogCard = ({ blog }: { blog: Blog }) => {
@@ -138,31 +140,7 @@ export const HomePage = () => {
       <HomeOurProducts />
 
       {/* Partners */}
-      <div className="p-10">
-        <h1 className="text-center font-bold text-xl mb-8">Our partners</h1>
-        <Marquee className="overflow-hidden" pauseOnHover={true} speed={50}>
-          {partnerBanners.length > 0 ? (
-            partnerBanners.map((banner, index) => (
-              <div key={`${banner.bannerName}-${index}`} className="mx-8 flex-shrink-0">
-                <img
-                  src={banner.imageUrl ?? ""}
-                  alt={banner.bannerName ?? "Partner Logo"}
-                  className="h-[10rem] w-auto object-contain"
-                />
-              </div>
-            ))
-          ) : (
-            Array(6)
-              .fill(0)
-              .map((_, i) => (
-                <div
-                  key={i}
-                  className="h-16 w-16 rounded-full bg-gray-200 animate-pulse mx-8 flex-shrink-0"
-                />
-              ))
-          )}
-        </Marquee>
-      </div>
+      <OurPartners />
 
       {/* Responsive Videos */}
       {/* ... your video section unchanged ... */}
