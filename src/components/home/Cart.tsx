@@ -55,9 +55,6 @@ interface CartItemProps {
 const CartItemComponent: React.FC<CartItemProps> = ({
   item,
   dispatch,
-  userPresent,
-  quantity,
-  itemId,
 }) => {
   const product: Product | undefined = useSelector((state: RootState) => {
     if (typeof item.product === "string") {
@@ -70,8 +67,6 @@ const CartItemComponent: React.FC<CartItemProps> = ({
   const removeLoading = useSelector(selectRemoveCartLoading);
 
   const isCartUpdating = updateLoading || removeLoading;
-  const user = useSelector(selectUser);
-  const cartItems = useSelector(selectCartItems);
   const [count, setCount] = useState(item.quantity);
   const [loadingMinus, setLoadingMinus] = useState(false);
   const [loadingPlus, setLoadingPlus] = useState(false);
@@ -277,6 +272,8 @@ export const Cart: React.FC = () => {
     e.preventDefault();
     console.log("Checkout initiated");
 
+
+
     if (!user) {
       toast.error("Please login to proceed", { icon: <ToastFaliure /> });
       console.log("User not logged in.");
@@ -323,22 +320,33 @@ export const Cart: React.FC = () => {
       ).unwrap();
       console.log("Payment initiation response:", paymentRes);
       const paymentData = paymentRes.data || paymentRes;
-      
-      console.log("Received payment data:", paymentData);
-      console.log("Razorpay object:", (window as any).Razorpay);
-      console.log("Razorpay key:", paymentData?.key);
-      console.log("Razorpay order ID:", paymentData?.order.razorpay_order_id);
-      if (!paymentData?.key) {
-        throw new Error("Invalid payment data");
-      }
 
-      console.log("Payment data for Razorpay:", paymentData);
+      console.log("=== PAYMENT DATA DEBUG ===");
+      console.log("Full paymentData:", paymentData);
+      console.log("paymentData.order:", paymentData.order);
+      console.log("paymentData.order.id:", paymentData.order.id);
+      console.log("paymentData.payment.notes:", paymentData.payment.notes);
+      console.log("========================");
 
       const order = paymentData.payment;
 
       if (!paymentData.key || !order) {
         throw new Error("Invalid payment data");
       }
+
+      let razorpayOrderId = paymentData.order.id;
+    
+    // If that doesn't work, try these alternatives:
+    if (!razorpayOrderId) {
+      razorpayOrderId = paymentData.payment.notes?.razorpayOrder?.id;
+    }
+    
+    if (!razorpayOrderId) {
+      razorpayOrderId = paymentData.payment.razorpayOrderId;
+    }
+
+    console.log("Final order ID for Razorpay:", razorpayOrderId);
+
       const options = {
         key: paymentData.key,
         amount: Math.round(order.amount * 100), // in paise
@@ -346,11 +354,17 @@ export const Cart: React.FC = () => {
         name: "Daadis.in",
         description: `Order #${order.receipt}`,
         image: "/logo.svg",
-        order_id: order.razorpayOrderId,
+        order_id:  paymentData.payment.notes?.razorpayOrder?.id,
         handler: async (response: RazorpayPaymentData) => {
           console.log("razorpay_order_id:", response.razorpay_order_id);
           console.log("razorpay_payment_id:", response.razorpay_payment_id);
           console.log("razorpay_signature:", response.razorpay_signature);
+
+          if (!response.razorpay_order_id || !response.razorpay_payment_id || !response.razorpay_signature) {
+            console.error("Missing Razorpay fields:", response);
+            toast.error("Payment verification failed - incomplete data");
+            return;
+          }
         try {
           await dispatch(
             handlePaymentSuccess({
@@ -382,6 +396,8 @@ export const Cart: React.FC = () => {
           }
         }
       };
+
+      console.log("Razorpay options object:", options);
 
       const rzp = new (window as any).Razorpay(options);
       rzp.on("payment.failed", (response: any) => {
@@ -425,7 +441,7 @@ export const Cart: React.FC = () => {
           </p>
         )}
         <hr className="col-span-5 w-[98%] m-auto mb-4"/>
-        {cartItems?.map((cartItem: any, index: number) => {
+        {cartItems?.map((cartItem: any ) => {
           return (
             <div key={cartItem._id}>
               <CartItemComponent
