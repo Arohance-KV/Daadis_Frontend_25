@@ -24,6 +24,7 @@ import {
   applyDiscount,
   removeDiscount,
   selectRemoveDiscountLoading,
+  clearAppliedDiscount,
 } from "../../redux1/cartSlice";
 
 import { Product } from "../../redux1/productSlice";
@@ -44,7 +45,6 @@ import {
   selectCurrentDiscount,
   selectDiscountLoading,
   selectDiscountError,
-  clearCurrentDiscount,
 } from "../../redux1/discountSlice";
 
 interface CartItemProps {
@@ -206,7 +206,7 @@ export const Cart: React.FC = () => {
   const [checkoutLoading, setCheckoutLoading] = useState(false);
 
   const [couponCode, setCouponCode] = useState("");
-  const [localDiscountValue, setLocalDiscountValue] = useState(0);
+  const [localDiscountValue] = useState(0);
   const [couponApplied, setCouponApplied] = useState(false);
 
   const currentDiscount = useSelector(selectCurrentDiscount);
@@ -217,11 +217,11 @@ export const Cart: React.FC = () => {
   const shippingCharge = 10; // Rs 10 fixed
   const gstPercent = 0.18; // 18%
   
-  const subtotal = Math.round(cartTotals?.total || 0);
-  const discountAmount = Math.round(localDiscountValue);
-  const calcTotalBeforeTax = Math.round(subtotal - discountAmount);
+  const subtotal = cartTotals?.total || 0;
+  const discountAmount = localDiscountValue;
+  const calcTotalBeforeTax = subtotal - discountAmount;
   const gstAmount = Math.round((calcTotalBeforeTax + shippingCharge) * gstPercent);
-  const grandTotal = Math.round(calcTotalBeforeTax + shippingCharge + gstAmount);
+  const grandTotal = calcTotalBeforeTax + shippingCharge + gstAmount;
 
   useEffect(() => {
     dispatch(fetchCartDetails());
@@ -238,25 +238,17 @@ export const Cart: React.FC = () => {
   }, []);
 
   const removeDiscountHandler = async () => {
-    try {
-      // Call the API to remove discount from cart
-      await dispatch(removeDiscount()).unwrap();
-      
-      // Clear the coupon input UI state
-      setCouponCode('');
-      setCouponApplied(false);
-      
-      // Clear discount from discount slice state
-      dispatch(clearCurrentDiscount());
-      
-      // Refresh cart details to sync the cart state without discount
-      await dispatch(fetchCartDetails());
-
-      toast.success("Discount removed successfully.", { className: "font-[quicksand]", icon: <ToastSuccess /> });
-    } catch (error) {
-      toast.error("Failed to remove discount.", { className: "font-[quicksand]", icon: <ToastFaliure /> });
-    }
-  };
+  try {
+    await dispatch(removeDiscount()).unwrap();
+    dispatch(clearAppliedDiscount());
+    await dispatch(fetchCartDetails());
+    setCouponCode('');
+    setCouponApplied(false);
+    toast.success("Discount removed successfully.");
+  } catch {
+    toast.error("Failed to remove discount.");
+  }
+};
 
   const handleApplyCoupon = () => {
   if (!couponCode.trim()) {
@@ -396,8 +388,8 @@ export const Cart: React.FC = () => {
           ).unwrap();
           toast.success("Payment successful!");
           await dispatch(clearCart()).unwrap();
-          dispatch(fetchProfile());
-          navigate("/payment-success");
+          //dispatch(fetchProfile());
+          navigate("/profile");
         } catch (error) {
           const err = error as Error;
           console.error("Payment verification error:", err);
@@ -606,6 +598,3 @@ export const Cart: React.FC = () => {
   );
 };
 
-function fetchProfile(): any {
-  throw new Error("Function not implemented.");
-}

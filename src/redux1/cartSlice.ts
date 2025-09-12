@@ -1,5 +1,5 @@
 //cartSlice.ts
-import { createSlice, createAsyncThunk, PayloadAction, AsyncThunkAction, ThunkDispatch, UnknownAction } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, PayloadAction, ThunkDispatch, UnknownAction } from '@reduxjs/toolkit';
 
 // Types and Interfaces
 export interface CartItem {
@@ -189,7 +189,11 @@ export const fetchCartDetails = createAsyncThunk<
   { rejectValue: string }
 >('cart/fetchCartDetails', async (_, { rejectWithValue }) => {
   try {
-    const response = await apiCall('/cart/details');
+    const response = await apiCall('/cart/details', {
+        headers: {
+          'Cache-Control': 'no-cache',
+        },
+    });
     return response;
   } catch (error) {
     return rejectWithValue(error instanceof Error ? error.message : 'Failed to fetch cart details');
@@ -288,6 +292,7 @@ export const removeDiscount = createAsyncThunk<
   try {
     const response = await apiCall('/cart/remove-discount', {
       method: 'DELETE',
+      body: JSON.stringify({ type: 'all' }),
     });
 
     return response;
@@ -588,6 +593,3 @@ export const selectCartDiscountAmount = (state: { cart: CartState }) =>
 // Export reducer
 export default cartSlice.reducer;
 
-function dispatch(arg0: AsyncThunkAction<CartDetailsResponse, void, { rejectValue: string; state?: unknown; dispatch?: ThunkDispatch<unknown, unknown, UnknownAction> | undefined; extra?: unknown; serializedErrorType?: unknown; pendingMeta?: unknown; fulfilledMeta?: unknown; rejectedMeta?: unknown; }>) {
-  throw new Error('Function not implemented.');
-}

@@ -54,7 +54,7 @@ export const HomePageNavBar = () => {
       (state) => state.wishlist.items
     );
     // Use local state for wishlist and cart count display
-    const [currentWishlist, setCurrentWishList] = useState<Product[]>(
+    const [, setCurrentWishList] = useState<Product[]>(
       wishlistItems?.map((item) => {
         // item.product can be a string or object, handle both cases, if only productId string is stored,
         // map to product data if needed or leave placeholder
@@ -75,8 +75,6 @@ export const HomePageNavBar = () => {
     );
     setCurrentCart(cartItems || []);
   }, [wishlistItems, cartItems]);
-
-    console.log(currentCart, currentWishlist, currentCart?.length, currentWishlist?.length)
 
     const [ isProductPageVisible, setIsProductPageVisible ] = useState(false);
     const [ isHamburgerMenuOpen, setIsHamburgerMenuOpen ] = useState(false);

@@ -3,7 +3,6 @@ import { cn } from "../../lib/utils";
 import gsap from "gsap";
 import { LoaderCircleIcon } from "lucide-react";
 import { optimizeCloudinaryUrl } from "../../utils/utility-functions";
-import { useState } from "react";
 
 export interface ISampleBanners {
   _id: string;
@@ -311,8 +310,6 @@ export const HomePageHeroCarousel = ({
   const changeBackgorund = (index: number, isNext: boolean) => {
     if (activeIndex > bannerHeros.length - 1 || activeIndex < 0) return;
 
-    console.log(bannerHeros[index]);
-
     gsap.fromTo(gradientRef.current, {
         // @ts-ignore
         background: `radial-gradient(circle, #${bannerHeros[index]?.bannerColours[0]!} 0%, #${bannerHeros[index]?.bannerColours[1]} 100%)`,
@@ -453,7 +450,7 @@ export const HomePageHeroCarousel = ({
         );
       } 
     });
-    console.log("changeBackgorund called, active index: "+index);
+    
   };
 
   useEffect(() => {
