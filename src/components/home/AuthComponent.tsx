@@ -21,7 +21,7 @@ export const AuthComponent = () => {
     });
 
     const clientid = '176323091300-j5h0a0k0kdf54e2k44hcibvkrguqtip2.apps.googleusercontent.com';
-    const redirectUri = 'http://localhost:5173/auth/google/callback';
+    const redirectUri = 'https://daddis-frontend.vercel.app/auth/google/callback';
     console.log("Client ID:", clientid);
     console.log("Redirect URI:", redirectUri);
     const handleGoogleLogin = () => {
