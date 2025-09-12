@@ -1,3 +1,4 @@
+//cartSlice.ts
 import { createSlice, createAsyncThunk, PayloadAction, AsyncThunkAction, ThunkDispatch, UnknownAction } from '@reduxjs/toolkit';
 
 // Types and Interfaces
@@ -101,6 +102,8 @@ export interface CartState {
   removeError: string | null;
   discountLoading: boolean;
   discountError: string | null;
+  removeDiscountLoading: boolean;
+  removeDiscountError: string | null;
   clearLoading: boolean;
   clearError: string | null;
 }
@@ -122,6 +125,8 @@ const initialState: CartState = {
   removeError: null,
   discountLoading: false,
   discountError: null,
+  removeDiscountLoading: false,
+  removeDiscountError: null,
   clearLoading: false,
   clearError: null,
 };
@@ -274,6 +279,23 @@ export const applyDiscount = createAsyncThunk<
   }
 });
 
+// Remove Discount
+export const removeDiscount = createAsyncThunk<
+  CartResponse,
+  void,
+  { rejectValue: string }
+>('cart/removeDiscount', async (_, { rejectWithValue }) => {
+  try {
+    const response = await apiCall('/cart/remove-discount', {
+      method: 'DELETE',
+    });
+
+    return response;
+  } catch (error) {
+    return rejectWithValue(error instanceof Error ? error.message : 'Failed to remove discount');
+  }
+});
+
 // Clear Cart
 export const clearCart = createAsyncThunk<
   { message: string },
@@ -313,6 +335,7 @@ const cartSlice = createSlice({
       state.updateError = null;
       state.removeError = null;
       state.discountError = null;
+      state.removeDiscountError = null;
       state.clearError = null;
     },
 
@@ -321,6 +344,12 @@ const cartSlice = createSlice({
       state.cart = null;
       state.items = [];
       state.totals = null;
+      state.appliedCoupon = null;
+      state.appliedVoucher = null;
+    },
+
+    // Clear Applied Discount (for local state management)
+    clearAppliedDiscount: (state) => {
       state.appliedCoupon = null;
       state.appliedVoucher = null;
     },
@@ -356,6 +385,8 @@ const cartSlice = createSlice({
       state.removeError = null;
       state.discountLoading = false;
       state.discountError = null;
+      state.removeDiscountLoading = false;
+      state.removeDiscountError = null;
       state.clearLoading = false;
       state.clearError = null;
     },
@@ -468,6 +499,24 @@ const cartSlice = createSlice({
         state.discountError = action.payload || 'Failed to apply discount';
       });
 
+    // Remove Discount
+    builder
+      .addCase(removeDiscount.pending, (state) => {
+        state.removeDiscountLoading = true;
+        state.removeDiscountError = null;
+      })
+      .addCase(removeDiscount.fulfilled, (state, action) => {
+        state.removeDiscountLoading = false;
+        state.cart = action.payload.data;
+        state.appliedCoupon = null;
+        state.appliedVoucher = null;
+        state.removeDiscountError = null;
+      })
+      .addCase(removeDiscount.rejected, (state, action) => {
+        state.removeDiscountLoading = false;
+        state.removeDiscountError = action.payload || 'Failed to remove discount';
+      });
+
     // Clear Cart
     builder
       .addCase(clearCart.pending, (state) => {
@@ -496,6 +545,7 @@ export const {
   setTotals,
   clearErrors,
   clearCartState,
+  clearAppliedDiscount,
   updateItemQuantityLocally,
   removeItemLocally,
   resetCartState,
@@ -517,6 +567,8 @@ export const selectRemoveCartLoading = (state: { cart: CartState }) => state.car
 export const selectRemoveCartError = (state: { cart: CartState }) => state.cart.removeError;
 export const selectDiscountLoading = (state: { cart: CartState }) => state.cart.discountLoading;
 export const selectDiscountError = (state: { cart: CartState }) => state.cart.discountError;
+export const selectRemoveDiscountLoading = (state: { cart: CartState }) => state.cart.removeDiscountLoading;
+export const selectRemoveDiscountError = (state: { cart: CartState }) => state.cart.removeDiscountError;
 export const selectClearCartLoading = (state: { cart: CartState }) => state.cart.clearLoading;
 export const selectClearCartError = (state: { cart: CartState }) => state.cart.clearError;
 
