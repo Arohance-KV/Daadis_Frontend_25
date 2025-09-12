@@ -151,10 +151,26 @@ return (
                                 setCartLoading(true);
                                 e.preventDefault();
                                 if (isInCart) {
-                                    await dispatch(removeCartItem(productData._id)).unwrap();
+                                  // 1. Find the cart item record for this product
+                                  const cartEntry = cartItems.find(item =>
+                                    typeof item.product === 'string'
+                                      ? item.product === productData._id
+                                      : item.product?._id === productData._id
+                                  );
+                                
+                                  if (!cartEntry) {
+                                    toast.error("Cart item not found");
+                                  } else {
+                                    // 2. Remove using the cart-item's _id
+                                    await dispatch(removeCartItem(cartEntry._id)).unwrap();
                                     setIsInCart(false);
-                                    setCartLoading(false);
-                                    return toast.success("Product deleted from cart successfully!", { className: "font-[quicksand]", icon: <Trash2 className="w-4 h-4 stroke-red-500" /> });
+                                    toast.success("Product removed from cart successfully!", {
+                                      className: "font-[quicksand]",
+                                      icon: <Trash2 className="w-4 h-4 stroke-red-500" />
+                                    });
+                                  }
+                                  setCartLoading(false);
+                                  return;
                                 }
                                 await dispatch(addToCart({ product: productData._id, quantity: 1 })).unwrap();
                                 setCartLoading(false);

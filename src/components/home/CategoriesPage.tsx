@@ -62,22 +62,30 @@ const ProductCard = ({
     }
 
     setCartLoading(true);
-    try {
-      if (isInCart) {
-        await dispatch(removeCartItem(product._id)).unwrap();
+     try {
+    if (isInCart) {
+      // Find the cart item entry
+      const cartEntry = currentCart.find(item =>
+        typeof item.product === 'object'
+          ? item.product._id === product._id
+          : item.product === product._id
+      );
+      if (cartEntry) {
+        await dispatch(removeCartItem(cartEntry._id)).unwrap();
         setIsInCart(false);
         toast.success("Removed from cart", { icon: <Trash2 /> });
-      } else {
-        await dispatch(addToCart({ product: product._id, quantity: 1 })).unwrap();
-        setIsInCart(true);
-        toast.success("Added to cart", { icon: <ShoppingCart /> });
       }
-    } catch (error) {
-      toast.error("Failed to update cart");
-    } finally {
-      setCartLoading(false);
+    } else {
+      await dispatch(addToCart({ product: product._id, quantity: 1 })).unwrap();
+      setIsInCart(true);
+      toast.success("Added to cart", { icon: <ShoppingCart /> });
     }
-  };
+  } catch {
+    toast.error("Failed to update cart");
+  } finally {
+    setCartLoading(false);
+  }
+};
 
   const handleWishToggle = async (e: React.MouseEvent) => {
     e.preventDefault();
