@@ -20,12 +20,10 @@ export const AuthComponent = () => {
       phoneNumber: "",
     });
 
-    const clientid = '176323091300-j5h0a0k0kdf54e2k44hcibvkrguqtip2.apps.googleusercontent.com';
-    const redirectUri = 'https://daddis-frontend.vercel.app/auth/google/callback';
-    console.log("Client ID:", clientid);
-    console.log("Redirect URI:", redirectUri);
+    const clientid = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+    const redirectUri = import.meta.env.VITE_GOOGLE_REDIRECT_URI;
     const handleGoogleLogin = () => {
-        const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${encodeURIComponent(clientid)}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=profile email`;
+        const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientid}&redirect_uri=${redirectUri}&response_type=code&scope=profile email`;
         window.location.href = googleAuthUrl;
     };
     const handleLogin = () => {
