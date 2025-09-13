@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button } from "../ui/button";
 import { HomePageHeroCarousel } from "./HomePageHeroCarousel";
-import Marquee from "react-fast-marquee";
 import HomeOurProducts from "./Home-OurProducts";
 import AnimatedTestimonials from "./Home-Testimonials";
 import DaadisFAQ from "./faq";
@@ -93,13 +92,6 @@ export const HomePage = () => {
   const blogs = useSelector(selectBlogs);
   const blogsLoading = useSelector(selectBlogsLoading);
 
-  // Replace this with your actual partner banners or a fallback empty array
-  const partnerBanners = [
-    { bannerName: "Partner 1", imageUrl: "https://res.cloudinary.com/dmrgscauc/image/upload/v1757518409/bigbasket-logo-png_seeklogo-612610_ftkbuf.png" },
-    { bannerName: "Partner 2", imageUrl: "https://res.cloudinary.com/dmrgscauc/image/upload/v1757518411/blinkit-logo_x5upx8.webp" },
-    { bannerName: "Partner 3", imageUrl: "https://res.cloudinary.com/dmrgscauc/image/upload/v1757518411/Swiggy_pnuh4b.png" }, 
-    { bannerName: "Partner 4", imageUrl: "https://res.cloudinary.com/dmrgscauc/image/upload/v1757518411/Zepto_Logo.svg_xah0vo.png" },
-  ];
 
   const [, setBannerHeros] = useState<Category[]>([]);
   const [, setTopProducts] = useState<Product[]>([]);

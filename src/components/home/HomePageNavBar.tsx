@@ -107,8 +107,6 @@ export const HomePageNavBar = () => {
     {/* Products dropdown with hover functionality */}
     <div 
         className="relative"
-        onMouseEnter={() => setIsProductPageVisible(true)}
-        onMouseLeave={() => setIsProductPageVisible(false)}
     >
         <Link 
             to="/category/all" 
@@ -121,8 +119,6 @@ export const HomePageNavBar = () => {
             <div 
                 ref={productDropMenuRef} 
                 className="absolute p-6 gap-6 flex flex-col max-h-[500px] flex-wrap rounded-lg w-[600px] top-full left-0 bg-white shadow-xl border border-gray-200 z-50"
-                onMouseEnter={() => setIsProductPageVisible(true)}
-                onMouseLeave={() => setIsProductPageVisible(false)}
             >
                 {categories?.map((category, categoryIndex) => {
                     return (
