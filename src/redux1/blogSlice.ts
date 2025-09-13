@@ -1,16 +1,24 @@
 // redux1/blogsSlice.ts
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 
+export interface BlogContent {
+  design: any; // You can define this more specifically if needed
+  markup: string; // This contains the HTML content
+}
+
 export interface Blog {
   _id: string;
   title: string;
-  content?: string;
+  blogName?: string;
+  content?: string; // Keep this for backwards compatibility or other content
+  blogContent?: BlogContent; // Add this for the new structure
   blogImgUrl?: {
     url: string;
+    publicId?: string;
   };
   createdAt?: string;
   updatedAt?: string;
-  // add other fields as per your API response
+  __v?: number;
 }
 
 export interface BlogsResponse {
@@ -49,10 +57,12 @@ const apiCall = async (url: string, options: RequestInit = {}) => {
       ...options.headers,
     },
   });
+  
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
     throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
   }
+  
   return response.json();
 };
 
@@ -109,7 +119,7 @@ const blogsSlice = createSlice({
         state.isLoading = false;
         state.error = action.payload || 'Failed to fetch blogs';
       })
-
+      
       // getBlogById
       .addCase(getBlogById.pending, (state) => {
         state.isLoading = true;

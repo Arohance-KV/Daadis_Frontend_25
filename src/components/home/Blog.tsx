@@ -1,11 +1,65 @@
+//Blog.tsx
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../redux1/store";
 import { getAllBlogs, selectBlogs, selectBlogsLoading, selectBlogsError } from "../../redux1/blogSlice";
 import { Button } from "../ui/button";
-import { Plus, X, Calendar } from "lucide-react";
+import { Plus, X, Calendar, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
+import { optimizeCloudinaryUrl } from "../../utils/utility-functions";
 
+// Blog Card component matching HomePage HomeBlogCard
+const Blog = ({ blog }: { blog: any }) => {
+  const navigate = useNavigate();
+
+  return (
+    <article className="group bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden border border-gray-100 h-full flex flex-col">
+      {/* Image Container with fixed height */}
+      <div className="relative overflow-hidden h-48">
+        <img
+          src={optimizeCloudinaryUrl(blog?.blogImgUrl?.url ?? "")}
+          alt={blog.title}
+          className="w-full h-full object-cover transition-transform duration-300"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100" />
+      </div>
+
+      {/* Content Container */}
+      <div className="p-4 flex flex-col flex-1">
+        {/* Date */}
+        <div className="flex items-center text-xs text-gray-500 mb-2">
+          <Calendar className="w-4 h-4 mr-1" />
+          <time dateTime={blog.createdAt ?? "2024-01-01"}>
+            {blog.createdAt
+              ? new Date(blog.createdAt).toLocaleDateString()
+              : "January 1, 2024"}
+          </time>
+        </div>
+
+        {/* Title */}
+        <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2 flex-1">
+          {blog.title}
+        </h3>
+
+        {/* Excerpt */}
+        <p className="text-gray-600 text-sm line-clamp-2 mb-3">
+          {blog.content
+            ? blog.content.slice(0, 100) + "..."
+            : "Discover insights and stories from our blog."}
+        </p>
+
+        <Button
+          variant="ghost"
+          onClick={() => navigate(`/blog/${blog._id}`)}
+          className="self-start p-0"
+        >
+          Read More <ArrowRight className="w-4 h-4 ml-1" />
+        </Button>
+      </div>
+    </article>
+  );
+};
 
 export const BlogPage = () => {
     const dispatch = useDispatch<AppDispatch>();
@@ -67,7 +121,7 @@ export const BlogPage = () => {
                   <p className="text-center">Loading blogs...</p>
                 ) : blogs.length > 0 ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8 mb-16">
-                    {blogs.map((blog) => (
+                    {displayedData.map((blog) => (
                       <Blog key={blog._id} blog={blog} />
                     ))}
                   </div>
