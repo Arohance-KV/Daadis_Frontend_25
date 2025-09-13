@@ -1,6 +1,7 @@
-import { ChevronLeft, Loader2, ShoppingCart, X } from "lucide-react";
+// WishListPage.tsx
+import { ChevronLeft, Loader2, X } from "lucide-react";
 import { Button } from "../ui/button";
-import { Link, useNavigate } from "react-router-dom";
+import {  useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { cn } from "../../lib/utils";
 import { useDispatch, useSelector } from "react-redux";
@@ -27,7 +28,11 @@ interface WishListCardProps {
 
 const WishListCard = ({ user, wishListItem, cart, productDetails }: WishListCardProps) => {
   const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+
+  // Get user authentication status
+  const isAuthenticated = !!user;
 
   // WishlistItem has `product` as string representing product ID
   const prodId = wishListItem.product;
@@ -35,6 +40,13 @@ const WishListCard = ({ user, wishListItem, cart, productDetails }: WishListCard
   const inCart = cart.some((ci) => ci.product === prodId);
 
   const onRemove = async () => {
+    // Check if user is authenticated before removing
+    if (!isAuthenticated) {
+      toast.error("Please login to manage your wishlist");
+      navigate('/auth');
+      return;
+    }
+    
     setLoading(true);
     try {
       if (user?._id) {
@@ -57,6 +69,13 @@ const WishListCard = ({ user, wishListItem, cart, productDetails }: WishListCard
   };
 
   const onMoveToCart = async () => {
+    // Check if user is authenticated before adding to cart
+    if (!isAuthenticated) {
+      toast.error("Please login to add items to cart");
+      navigate('/auth');
+      return;
+    }
+    
     setLoading(true);
     try {
       await dispatch(addToCart({ product: prodId, quantity: 1 })).unwrap();
@@ -126,6 +145,15 @@ export const WishListPage = () => {
   const wishlistLoading = useSelector(selectWishlistLoading);
   const cart = useSelector(selectCartItems);
 
+  // Check authentication on component mount
+  useEffect(() => {
+    if (!user) {
+      toast.error("Please login to view your wishlist");
+      navigate('/auth');
+      return;
+    }
+  }, [user, navigate]);
+
   // State to store product details for each wishlist item
   const [productDetails, setProductDetails] = useState<{ [key: string]: Product }>({});
   const [loadingProducts, setLoadingProducts] = useState(true);
@@ -172,6 +200,7 @@ export const WishListPage = () => {
                 : { l: 0, b: 0, h: 0 };
               const product: Product = {
                 _id: prod._id,
+                product: prod.product ?? "",
                 name: prod.name,
                 code: prod.code,
                 category: prod.category,
@@ -207,6 +236,11 @@ export const WishListPage = () => {
     fetchProductDetails();
   }, [wishlist, dispatch]);
 
+  // Don't render if user is not authenticated
+  if (!user) {
+    return null;
+  }
+
   if (wishlistLoading || loadingProducts) {
     return (
       <div className="flex justify-center items-center h-[calc(100vh-56px)]">
@@ -235,7 +269,7 @@ export const WishListPage = () => {
       
       {wishlist.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-[calc(100vh-152px)]">
-          <p className="text-2xl mb-4">No items wishlisted 😢</p>
+          <p className="text-2xl mb-4">No items wishlisted</p>
           <Button onClick={() => navigate("/category/all")}> 
             Continue Shopping
           </Button>

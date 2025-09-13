@@ -1,5 +1,6 @@
+//CategoryPage.tsx
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import { Button } from "../ui/button";
 import { ChevronLeft, Heart, ImageOff, Loader2, ShoppingCart, Trash2, ChevronDown, Menu } from "lucide-react";
 import { cn } from "../../lib/utils";
@@ -40,6 +41,7 @@ const ProductCard = ({
   currentWishList: Product[];
 }) => {
   const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
   const [isCartLoading, setCartLoading] = useState(false);
   const [isWishLoading, setWishLoading] = useState(false);
   const [isInWishlist, setIsInWishlist] = useState(
@@ -49,11 +51,22 @@ const ProductCard = ({
     currentCart.some((item) => item.product._id === product._id)
   );
 
+  // Get user authentication status
+  const user = useSelector((state: RootState) => state.auth.user);
+  const isAuthenticated = !!user;
+
   // Check if product is out of stock
   const isOutOfStock = product.stock === 0;
 
   const handleCartToggle = async (e: React.MouseEvent) => {
     e.preventDefault();
+    
+    // Check if user is authenticated
+    if (!isAuthenticated) {
+      toast.error("Please login to add items to cart");
+      navigate('/auth');
+      return;
+    }
     
     // Prevent adding to cart if out of stock
     if (isOutOfStock) {
@@ -89,6 +102,14 @@ const ProductCard = ({
 
   const handleWishToggle = async (e: React.MouseEvent) => {
     e.preventDefault();
+    
+    // Check if user is authenticated
+    if (!isAuthenticated) {
+      toast.error("Please login to add items to wishlist");
+      navigate('/auth');
+      return;
+    }
+    
     setWishLoading(true);
     try {
       if (isInWishlist) {

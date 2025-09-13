@@ -1,3 +1,4 @@
+// ProductPage.tsx
 import { ChevronLeft, LucideHeart, LucideImageOff, ShoppingCart, Trash2, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -23,6 +24,10 @@ export const ProductPage = () => {
   const productData = useSelector(selectCurrentProduct);
   const cartItems = useSelector((state: RootState) => state.cart.items);
   const wishlistItems = useSelector((state: RootState) => state.wishlist.items);
+  // Get user authentication status
+  const user = useSelector((state: RootState) => state.auth.user);
+  const isAuthenticated = !!user;
+  
   const images = productData?.images ?? [];
   const [selectedIndex, setSelectedIndex] = useState(0)
   const [isInWishlist, setIsInWishlist] = useState(false);
@@ -148,8 +153,16 @@ return (
                         <Button
                             disabled={cartLoading}
                             onClick={async (e) => {
-                                setCartLoading(true);
                                 e.preventDefault();
+                                
+                                // Check if user is authenticated
+                                if (!isAuthenticated) {
+                                    toast.error("Please login to add items to cart");
+                                    navigate('/auth');
+                                    return;
+                                }
+                                
+                                setCartLoading(true);
                                 if (isInCart) {
                                   // 1. Find the cart item record for this product
                                   const cartEntry = cartItems.find(item =>
@@ -189,8 +202,16 @@ return (
                     {productData?._id ? (
                         <Button
                             onClick={async (e) => {
-                                setWishLoading(true);
                                 e.preventDefault();
+                                
+                                // Check if user is authenticated
+                                if (!isAuthenticated) {
+                                    toast.error("Please login to add items to wishlist");
+                                    navigate('/auth');
+                                    return;
+                                }
+                                
+                                setWishLoading(true);
                                 if (isInWishlist) {
                                     await dispatch(removeFromWishlist(productData._id)).unwrap();
                                     setWishLoading(false);
