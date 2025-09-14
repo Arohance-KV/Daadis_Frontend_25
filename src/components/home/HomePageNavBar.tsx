@@ -11,7 +11,7 @@ import { Badge } from "../ui/badge";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import type { AppDispatch, RootState } from "../../redux1/store";
 import { Category } from "../../redux1/categorySlice";
-import { Product } from "../../redux1/productSlice";
+import { Product, getAllProducts } from "../../redux1/productSlice";
 import { CartItem } from "../../redux1/cartSlice";
 import { WishlistItem } from "../../redux1/wishlistSlice";
 import { AuthComponent } from "./AuthComponent";
@@ -85,6 +85,11 @@ export const HomePageNavBar = () => {
     const handleMouseEnter = () => {
         calculateDropdownPosition();
         setIsProductPageVisible(true);
+        // ADDITIONAL FIX: Try to load products when dropdown is opened if not already loaded
+        if (!productDataFromStore || productDataFromStore.length === 0) {
+            //console.log("Loading products on dropdown hover...");
+            dispatch(getAllProducts());
+        }
     };
 
     const getDropdownClasses = () => {
@@ -115,6 +120,23 @@ export const HomePageNavBar = () => {
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, [isProductPageVisible]);
+
+    // CRITICAL FIX: Load products when component mounts
+    useEffect(() => {
+        // Always ensure products are loaded, regardless of which page we're on
+        if (!productDataFromStore || productDataFromStore.length === 0) {
+            //console.log("Loading products for navbar dropdown...");
+            dispatch(getAllProducts());
+        }
+    }, [dispatch, productDataFromStore]);
+
+    useEffect(() => {
+        //console.log("=== NAVBAR PRODUCT DEBUG ===");
+        //console.log("Current page path:", window.location.pathname);
+        //console.log("Available categories:", categories?.length || 0);
+        //console.log("Available products:", productDataFromStore?.length || 0);
+        // ... more debug info
+    }, [categories, productDataFromStore]);
 
     return (
         <div className="z-[100] font-[quicksand] bg-white scroll-smooth w-full top-0 fixed justify-center items-center flex h-14">
@@ -184,6 +206,14 @@ export const HomePageNavBar = () => {
                                 >
                                     VIEW ALL PRODUCTS
                                 </Link>
+
+                                {/* ADD THE LOADING STATE HERE */}
+                                {(!productDataFromStore || productDataFromStore.length === 0) && (
+                                    <div className="flex items-center justify-center py-4">
+                                        <LoaderCircle className="animate-spin w-4 h-4 mr-2" />
+                                        <span className="text-sm text-gray-500">Loading products...</span>
+                                    </div>
+                                )}
                                 
                                 {categories && categories.length > 0 ? (
                                     categories.map((category, categoryIndex) => {

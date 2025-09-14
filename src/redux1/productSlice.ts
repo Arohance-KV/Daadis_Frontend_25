@@ -311,8 +311,10 @@ export const getAllProducts = createAsyncThunk<
   try {
     const searchParams = new URLSearchParams();
     
-    if (params?.page) searchParams.append('page', params.page.toString());
-    if (params?.limit) searchParams.append('limit', params.limit.toString());
+    // default to page 1
+    searchParams.append('page', (params?.page ?? 1).toString());
+      // default to a high limit to fetch all
+    searchParams.append('limit', (params?.limit ?? 1000).toString());
     if (params?.sortBy) searchParams.append('sortBy', params.sortBy);
     if (params?.sortOrder) searchParams.append('sortOrder', params.sortOrder);
     
