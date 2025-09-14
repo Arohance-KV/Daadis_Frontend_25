@@ -1,30 +1,13 @@
-import { Link, 
-    useNavigate
- } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../ui/button";
-import { CircleHelp,
-    // Eye, EyeOff,
-     Headset, HeartCrack, HomeIcon,
-    //   Loader2,
-      LoaderCircle, LogIn, LucideHeart,
-    //    Settings,
-        ShoppingCart, Store, UserCircle2, Rss  } from "lucide-react";
+import { CircleHelp, Headset, HeartCrack, HomeIcon, LoaderCircle, LogIn, LucideHeart, ShoppingCart, Store, UserCircle2, Rss, ChevronDown } from "lucide-react";
 import { useEffect, useRef, useState} from "react";
-// import { yellow } from "@mui/material/colors";
-import { Avatar
-    // , createTheme, IconButton, TextField, ThemeProvider 
-} from "@mui/material";
-// import { z } from "zod";
-// import { Form, FormControl, FormField, FormItem, FormMessage } from "../ui/form";
-// import { useForm } from "react-hook-form";
-// import { zodResolver } from "@hookform/resolvers/zod";
+import { Avatar } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { Squash as Hamburger } from 'hamburger-react';
 import { slide as Menu } from 'react-burger-menu';
 import { getProfile, User } from "../../redux1/authSlice";
-// import Cookies from "js-cookie";
 import { Badge } from "../ui/badge";
-// import { updateCart, updateWishList } from "../../utils/utility-functions";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import type { AppDispatch, RootState } from "../../redux1/store";
 import { Category } from "../../redux1/categorySlice";
@@ -33,10 +16,7 @@ import { CartItem } from "../../redux1/cartSlice";
 import { WishlistItem } from "../../redux1/wishlistSlice";
 import { AuthComponent } from "./AuthComponent";
 
-
-
 export const HomePageNavBar = () => {
-
     const categories = useSelector<RootState, Category[]>(
       (state) => state.category.categories
     );
@@ -46,120 +26,253 @@ export const HomePageNavBar = () => {
     const customerData = useSelector<RootState, User | null>(
       (state) => state.auth.user
     );
-    // Select cart items and wishlist items from respective slices
     const cartItems = useSelector<RootState, CartItem[]>(
       (state) => state.cart.items
     );
     const wishlistItems = useSelector<RootState, WishlistItem[]>(
       (state) => state.wishlist.items
     );
-    // Use local state for wishlist and cart count display
+
     const [, setCurrentWishList] = useState<Product[]>(
       wishlistItems?.map((item) => {
-        // item.product can be a string or object, handle both cases, if only productId string is stored,
-        // map to product data if needed or leave placeholder
         if (typeof item.product === "object") return item.product as Product;
-        return null; // or map from productDataFromStore by id if possible
+        return null;
       }).filter(Boolean) as Product[]
     );
     const [currentCart, setCurrentCart] = useState<CartItem[]>(cartItems || []);
     const productDropMenuRef = useRef<HTMLDivElement | null>(null);
+    const productsLinkRef = useRef<HTMLDivElement | null>(null);
     const navigate = useNavigate();
 
     useEffect(() => {
-    // Update current wishlist and cart from redux state on changes
-    setCurrentWishList(
-      wishlistItems?.map((item) =>
-        typeof item.product === "object" ? (item.product as Product) : null
-      ).filter(Boolean) as Product[]
-    );
-    setCurrentCart(cartItems || []);
-  }, [wishlistItems, cartItems]);
+        setCurrentWishList(
+          wishlistItems?.map((item) =>
+            typeof item.product === "object" ? (item.product as Product) : null
+          ).filter(Boolean) as Product[]
+        );
+        setCurrentCart(cartItems || []);
+    }, [wishlistItems, cartItems]);
 
-    const [ isProductPageVisible, setIsProductPageVisible ] = useState(false);
-    const [ isHamburgerMenuOpen, setIsHamburgerMenuOpen ] = useState(false);
+    const [isProductPageVisible, setIsProductPageVisible] = useState(false);
+    const [isHamburgerMenuOpen, setIsHamburgerMenuOpen] = useState(false);
+    const [dropdownPosition, setDropdownPosition] = useState<'left' | 'center' | 'right'>('left');
+    const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
 
-    const [ ] = useState(false);
     const dispatch = useDispatch<AppDispatch>();
     const user = useSelector((state: RootState) => state.auth.user);
     const loading = useSelector((state: RootState) => state.auth.profileLoading);
 
     useEffect(() => {
-    if (!user) dispatch(getProfile());
-  }, [dispatch, user]);
+        if (!user) dispatch(getProfile());
+    }, [dispatch, user]);
 
-    const [] = useState(false);
+    // Calculate dropdown position based on viewport
+    const calculateDropdownPosition = () => {
+        if (productsLinkRef.current) {
+            const rect = productsLinkRef.current.getBoundingClientRect();
+            const viewportWidth = window.innerWidth;
+            const dropdownWidth = Math.min(viewportWidth * 0.9, 800);
+            
+            if (rect.left + dropdownWidth > viewportWidth - 20) {
+                setDropdownPosition('right');
+            } 
+            else if (rect.left < 20) {
+                setDropdownPosition('left');
+            }
+            else {
+                setDropdownPosition('center');
+            }
+        }
+    };
+
+    const handleMouseEnter = () => {
+        calculateDropdownPosition();
+        setIsProductPageVisible(true);
+    };
+
+    const getDropdownClasses = () => {
+        const baseClasses = "absolute p-4 rounded-lg top-full bg-white shadow-xl border border-gray-200 z-50 min-w-[300px] max-w-[800px] w-auto";
+        
+        switch (dropdownPosition) {
+            case 'right':
+                return `${baseClasses} right-0`;
+            case 'center':
+                return `${baseClasses} left-1/2 transform -translate-x-1/2`;
+            default:
+                return `${baseClasses} left-0`;
+        }
+    };
+
+    const toggleCategory = (categoryId: string) => {
+        setExpandedCategory(expandedCategory === categoryId ? null : categoryId);
+    };
+
+    // Ensure dropdown fits in viewport
+    useEffect(() => {
+        const handleResize = () => {
+            if (isProductPageVisible) {
+                calculateDropdownPosition();
+            }
+        };
+        
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, [isProductPageVisible]);
+
+    // Debug: Log categories to see what's available
+    useEffect(() => {
+        console.log("Available categories:", categories);
+        console.log("Available products:", productDataFromStore);
+    }, [categories, productDataFromStore]);
 
     return (
         <div className="z-[100] font-[quicksand] bg-white scroll-smooth w-full top-0 fixed justify-center items-center flex h-14">
+            {/* Add custom CSS for hidden scrollbar */}
+            <style jsx>{`
+                .scrollbar-hide {
+                    -ms-overflow-style: none;  /* IE and Edge */
+                    scrollbar-width: none;  /* Firefox */
+                }
+                .scrollbar-hide::-webkit-scrollbar {
+                    display: none;  /* Chrome, Safari, Opera */
+                }
+            `}</style>
+            
             <section id="auth-component" className="opacity-0 z-[100] hidden absolute top-0 left-0 right-0 h-screen justify-center items-center bottom-0">
                 <AuthComponent />
             </section>
+            
             <div className="sm:flex hidden justify-evenly font-[quicksand] gap-4 items-center flex-1">
-    <Link to={"/"} className="text-sm capitalize font-[quicksand] transition-all duration-150 hover:bg-slate-500/10 flex justify-center items-center px-2 py-1 rounded-sm">
-        HOME
-    </Link>
+                <Link to={"/"} className="text-sm capitalize font-[quicksand] transition-all duration-150 hover:bg-slate-500/10 flex justify-center items-center px-2 py-1 rounded-sm">
+                    HOME
+                </Link>
 
-    <Link to={"/about-us"} className="text-sm capitalize font-[quicksand] transition-all duration-150 hover:bg-slate-500/10 flex justify-center items-center px-2 py-1 rounded-sm">
-        ABOUT
-    </Link>
-    
-    {/* Products dropdown with hover functionality */}
-    <div 
-        className="relative"
-    >
-        <Link 
-            to="/category/all" 
-            className="text-sm capitalize transition-all duration-150 hover:bg-slate-500/10 flex justify-center items-center px-2 py-1 rounded-sm"
-        >
-            PRODUCTS
-        </Link>
-        
-        {isProductPageVisible && (
-            <div 
-                ref={productDropMenuRef} 
-                className="absolute p-6 gap-6 flex flex-col max-h-[500px] flex-wrap rounded-lg w-[600px] top-full left-0 bg-white shadow-xl border border-gray-200 z-50"
-            >
-                {categories?.map((category, categoryIndex) => {
-                    return (
-                        <div key={categoryIndex} className="text-left min-w-[180px]">
-                            <span className="capitalize font-bold text-gray-800 text-sm mb-2 block border-b border-gray-200 pb-1">
-                                {category.name}
-                            </span>
-                            <ul className="space-y-1">
-                                {productDataFromStore
-                                    ?.filter((product) => product.category === category._id)
-                                    ?.map((product, productIndex) => (
-                                        <li key={productIndex}>
-                                            <Link 
-                                                to={`/product/${product._id}`} 
-                                                className="text-gray-600 hover:text-gray-800 text-xs transition-colors duration-150 hover:bg-gray-50 block py-1 px-2 rounded"
-                                                onClick={() => setIsProductPageVisible(false)}
-                                            >
-                                                {product.name}
-                                            </Link>
-                                        </li>
-                                    ))
-                                }
-                            </ul>
+                <Link to={"/about-us"} className="text-sm capitalize font-[quicksand] transition-all duration-150 hover:bg-slate-500/10 flex justify-center items-center px-2 py-1 rounded-sm">
+                    ABOUT
+                </Link>
+                
+                {/* Products dropdown with improved positioning */}
+                <div 
+                    ref={productsLinkRef}
+                    className="relative"
+                    onMouseEnter={handleMouseEnter}
+                    onMouseLeave={() => {
+                        setIsProductPageVisible(false);
+                        setExpandedCategory(null);
+                    }}
+                >
+                    <Link 
+                        to="/category/all" 
+                        className="text-sm capitalize transition-all duration-150 hover:bg-slate-500/10 flex justify-center items-center px-2 py-1 rounded-sm"
+                    >
+                        PRODUCTS
+                    </Link>
+                    
+                    {isProductPageVisible && (
+                        <div 
+                            ref={productDropMenuRef} 
+                            className={getDropdownClasses()}
+                            onMouseEnter={() => setIsProductPageVisible(true)}
+                            onMouseLeave={() => {
+                                setIsProductPageVisible(false);
+                                setExpandedCategory(null);
+                            }}
+                            style={{
+                                maxWidth: 'calc(100vw - 2rem)',
+                                maxHeight: '400px',
+                                overflowY: 'auto',
+                                overflowX: 'hidden',
+                            }}
+                        >
+                            <div className="space-y-2 scrollbar-hide" style={{ maxHeight: '360px', overflowY: 'auto' }}>
+                                {/* View All Categories Link */}
+                                <Link 
+                                    to="/category/all" 
+                                    className="block text-sm font-bold text-blue-600 hover:text-blue-800 border-b border-gray-200 pb-2 mb-3"
+                                    onClick={() => setIsProductPageVisible(false)}
+                                >
+                                    VIEW ALL PRODUCTS
+                                </Link>
+                                
+                                {categories && categories.length > 0 ? (
+                                    categories.map((category, categoryIndex) => {
+                                        // Get products for this category
+                                        const categoryProducts = productDataFromStore?.filter(
+                                            (product) => product.category === category._id
+                                        ) || [];
+                                        
+                                        // Show ALL categories, even if they have no products
+                                        // This ensures all categories from your store are displayed
+                                        const isExpanded = expandedCategory === category._id;
+                                        
+                                        return (
+                                            <div key={categoryIndex} className="border-b border-gray-100 last:border-b-0">
+                                                <button
+                                                    className="w-full flex items-center justify-between py-2 px-2 hover:bg-gray-50 rounded-sm transition-colors duration-150"
+                                                    onClick={() => toggleCategory(category._id)}
+                                                >
+                                                    <span className="capitalize font-semibold text-gray-800 text-sm">
+                                                        {category.name} ({categoryProducts.length})
+                                                    </span>
+                                                    <ChevronDown 
+                                                        className={`w-4 h-4 transition-transform duration-200 ${
+                                                            isExpanded ? 'rotate-180' : ''
+                                                        }`}
+                                                    />
+                                                </button>
+                                                
+                                                {isExpanded && (
+                                                    <div className="pl-4 pb-2">
+                                                        {categoryProducts.length > 0 ? (
+                                                            <div className="space-y-1 max-h-[150px] overflow-y-auto scrollbar-hide">
+                                                                {categoryProducts.map((product, productIndex) => (
+                                                                    <Link 
+                                                                        key={productIndex}
+                                                                        to={`/product/${product._id}`} 
+                                                                        className="block text-gray-600 hover:text-gray-800 text-xs transition-colors duration-150 hover:bg-gray-50 py-1 px-2 rounded truncate"
+                                                                        onClick={() => {
+                                                                            setIsProductPageVisible(false);
+                                                                            setExpandedCategory(null);
+                                                                        }}
+                                                                        title={product.name}
+                                                                    >
+                                                                        {product.name}
+                                                                    </Link>
+                                                                ))}
+                                                            </div>
+                                                        ) : (
+                                                            <div className="text-gray-400 text-xs pl-2 py-1">
+                                                                No products available in this category
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        );
+                                    })
+                                ) : (
+                                    <div className="text-gray-500 text-sm p-4">
+                                        <div>No categories available</div>
+                                        <div className="text-xs mt-1">Categories count: {categories?.length || 0}</div>
+                                    </div>
+                                )}
+                            </div>
                         </div>
-                    );
-                })}
-            </div>
-        )}
-    </div>
+                    )}
+                </div>
 
-    <Link to={"/blog"} className="text-sm capitalize transition-all duration-150 hover:bg-slate-500/10 flex justify-center items-center px-2 py-1 rounded-sm">
-        BLOG
-    </Link>
-    
-    <Link className="text-sm capitalize transition-all duration-150 hover:bg-slate-500/10 flex justify-center items-center px-2 py-1 rounded-sm" to={"/contact"}>
-        CONTACT
-    </Link>
-</div>
+                <Link to={"/blog"} className="text-sm capitalize transition-all duration-150 hover:bg-slate-500/10 flex justify-center items-center px-2 py-1 rounded-sm">
+                    BLOG
+                </Link>
+                
+                <Link className="text-sm capitalize transition-all duration-150 hover:bg-slate-500/10 flex justify-center items-center px-2 py-1 rounded-sm" to={"/contact"}>
+                    CONTACT
+                </Link>
+            </div>
+
+            {/* Mobile menu */}
             <div className="sm:hidden block">
                 <Hamburger toggled={isHamburgerMenuOpen} size={24} onToggle={() => {
-                    // e.preventDefault();
                     setIsHamburgerMenuOpen(!isHamburgerMenuOpen);
                 }}/>
                 <Menu className="bg-cyan-300" onClose={() => {
@@ -176,9 +289,7 @@ export const HomePageNavBar = () => {
                         }} className="text-sm capitalize transition-all duration-150 px-2 py-1 rounded-sm" to={"/"}>
                             <div className="items-center gap-4 font-bold text-[35px] my-[10px] flex">
                                 <HomeIcon />
-                                {/* <span className="bg-purple-600"> */}
-                                    HOME
-                                {/* </span> */}
+                                HOME
                             </div>
                         </Link>
                         <Link onClick={() => {
@@ -186,9 +297,7 @@ export const HomePageNavBar = () => {
                         }} className="text-sm capitalize transition-all duration-150 px-2 py-1 rounded-sm" to={"/category/all"}>
                             <div className="items-center gap-4 font-bold text-[35px] my-[10px] flex">
                                 <Store />
-                                {/* <span className="bg-purple-600"> */}
-                                    PRODUCTS
-                                {/* </span> */}
+                                PRODUCTS
                             </div>
                         </Link>
                         <Link onClick={()=>{
@@ -196,9 +305,7 @@ export const HomePageNavBar = () => {
                         }} className="text-sm capitalize transition-all duration-150 px-2 py-1 rounded-sm" to={"/about-us"}>
                             <div className="items-center gap-4 font-bold text-[35px] my-[10px] flex">
                                 <CircleHelp />
-                                {/* <span className="bg-purple-600"> */}
-                                    ABOUT
-                                {/* </span> */}
+                                ABOUT
                             </div>
                         </Link>
                         <Link onClick={() => {
@@ -206,9 +313,7 @@ export const HomePageNavBar = () => {
                         }} className="text-sm capitalize transition-all duration-150 px-2 py-1 rounded-sm" to={"/contact"}>
                             <div className="items-center gap-4 font-bold text-[35px] my-[10px] flex">
                                 <Headset />
-                                {/* <span className="bg-purple-600"> */}
-                                    CONTACT
-                                {/* </span> */}
+                                CONTACT
                             </div>
                         </Link>
                         <Link onClick={() => {
@@ -216,9 +321,7 @@ export const HomePageNavBar = () => {
                         }} className="text-sm capitalize transition-all duration-150 px-2 py-1 rounded-sm" to={"/blog"}>
                             <div className="items-center gap-4 font-bold text-[35px] my-[10px] flex">
                                 <Rss />
-                                {/* <span className="bg-purple-600"> */}
-                                    BLOGS
-                                {/* </span> */}
+                                BLOGS
                             </div>
                         </Link>
                     </div>
@@ -228,15 +331,13 @@ export const HomePageNavBar = () => {
                     </div>
                 </Menu>
             </div>
-            {/* <Link className="m-auto bg-blue-600 items-end flex-1 sm:flex-none flex justify-end" to={"/"}> */}
+
+            {/* Logo */}
             <Link className="ml-[100px]" to={"/"}>
                 <img className="h-20" src="/logo.svg" />
             </Link>
+
             <div className="justify-between gap-4 items-center flex flex-1">
-                {/* <div className="relative w-[60%] ml-16 hidden lg:block self-end justify-self-end bg-blue-500">
-                    <Input placeholder={"search"} className="pl-8" />
-                    <LucideSearch className="absolute top-[50%] w-4 h-4 translate-y-[-50%] left-2" />
-                </div> */}
                 <div className="flex-1 flex justify-end mr-4 gap-4 items-center">
                     <Link to={"/wishlist"} onClick={() => {
                         {console.log(customerData)}
@@ -245,7 +346,7 @@ export const HomePageNavBar = () => {
                         <Badge className="absolute z-0 right-[-25%] top-[-25%] text-[10px] rounded-full px-1 py-0" variant={"secondary"}>{wishlistItems?.length}</Badge>
                     </Link>
                     
-                    {/* Modified user profile section */}
+                    {/* User profile section */}
                     {!user ? (
                       <Popover>
                         <PopoverTrigger asChild>
