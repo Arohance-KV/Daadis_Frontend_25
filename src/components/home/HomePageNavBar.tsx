@@ -6,7 +6,7 @@ import { Avatar } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { Squash as Hamburger } from 'hamburger-react';
 import { slide as Menu } from 'react-burger-menu';
-import { getProfile, User } from "../../redux1/authSlice";
+import { getProfile } from "../../redux1/authSlice";
 import { Badge } from "../ui/badge";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import type { AppDispatch, RootState } from "../../redux1/store";
@@ -22,9 +22,6 @@ export const HomePageNavBar = () => {
     );
     const productDataFromStore = useSelector<RootState, Product[]>(
       (state) => state.product.products
-    );
-    const customerData = useSelector<RootState, User | null>(
-      (state) => state.auth.user
     );
     const cartItems = useSelector<RootState, CartItem[]>(
       (state) => state.cart.items
@@ -119,16 +116,10 @@ export const HomePageNavBar = () => {
         return () => window.removeEventListener('resize', handleResize);
     }, [isProductPageVisible]);
 
-    // Debug: Log categories to see what's available
-    useEffect(() => {
-        console.log("Available categories:", categories);
-        console.log("Available products:", productDataFromStore);
-    }, [categories, productDataFromStore]);
-
     return (
         <div className="z-[100] font-[quicksand] bg-white scroll-smooth w-full top-0 fixed justify-center items-center flex h-14">
             {/* Add custom CSS for hidden scrollbar */}
-            <style jsx>{`
+            <style>{`
                 .scrollbar-hide {
                     -ms-overflow-style: none;  /* IE and Edge */
                     scrollbar-width: none;  /* Firefox */
@@ -340,7 +331,6 @@ export const HomePageNavBar = () => {
             <div className="justify-between gap-4 items-center flex flex-1">
                 <div className="flex-1 flex justify-end mr-4 gap-4 items-center">
                     <Link to={"/wishlist"} onClick={() => {
-                        {console.log(customerData)}
                     }} className="transition-all z-[0] hover:scale-125 duration-250 hover:fill-red-500 relative">
                         {wishlistItems?.length == 0? (<HeartCrack className="transition-all"/>) : (<LucideHeart className="fill-red-500 stroke-red-500 transition-all"/>)}
                         <Badge className="absolute z-0 right-[-25%] top-[-25%] text-[10px] rounded-full px-1 py-0" variant={"secondary"}>{wishlistItems?.length}</Badge>
