@@ -292,13 +292,13 @@ export const Cart: React.FC = () => {
     if (!user.phoneNumber) {
       toast.error("Please add your phone number");
       console.log("User phone number missing, redirecting to shipping.");
-      navigate("/set-shipping");
+      navigate("/profile");
       return;
     }
     if (!defaultAddress || !defaultAddress.city) {
       toast.error("Please add your shipping address");
       console.log("User shipping address missing, redirecting to shipping.");
-      navigate("/set-shipping");
+      navigate("/profile");
       return;
     }
 
