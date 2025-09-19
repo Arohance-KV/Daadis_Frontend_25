@@ -122,7 +122,7 @@ const initialState: WishlistState = {
 };
 
 // Base URL - Updated with your provided URL
-const BASE_URL = import.meta.env.VITE_BASE_URL;
+const BASE_URL = "https://api.daadis.in";
 
 // Helper function to get auth token
 const getToken = (): string | null => {

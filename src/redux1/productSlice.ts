@@ -181,7 +181,7 @@ const initialState: ProductState = {
 };
 
 // Base URL - Updated with your provided URL
-const BASE_URL = import.meta.env.VITE_BASE_URL;
+const BASE_URL = "https://api.daadis.in";
 
 // API Helper function
 const apiCall = async (url: string, options: RequestInit = {}) => {

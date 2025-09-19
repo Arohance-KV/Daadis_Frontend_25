@@ -59,7 +59,7 @@ const initialState: AdminState = {
 };
 
 // Base URL
-const BASE_URL = import.meta.env.VITE_BASE_URL;
+const BASE_URL = "https://api.daadis.in";
 const getHeaders = (): HeadersInit => {
   const token = localStorage.getItem('adminAccessToken');
   return {

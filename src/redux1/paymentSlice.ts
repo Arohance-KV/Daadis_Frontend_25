@@ -32,7 +32,7 @@ const initialState: PaymentState = {
 };
 
 // Base URL
-const BASE_URL = import.meta.env.VITE_BASE_URL;
+const BASE_URL = "https://api.daadis.in";
 const getToken = () => localStorage.getItem('accessToken');
 
 // Headers
