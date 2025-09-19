@@ -481,6 +481,13 @@ export const HomePageHeroCarousel = ({
 
   return bannerHeros.length == 0 ? <div id="hero-section" className="p-0 m-0 overflow-hidden flex justify-center relative items-center sm:h-[calc(100vh-56px)] z-0 w-full h-[auto] aspect-square"><LoaderCircleIcon className="w-14 h-14 animate-spin stroke-yellow-500" /> </div> : (
     <div id="hero-section" className="p-0 m-0 overflow-hidden flex justify-center relative items-center sm:h-[calc(100vh-56px)] z-0 w-full h-[auto] aspect-square">
+      {/* Maintenance Banner */}
+      <div className="absolute top-0 left-0 right-0 z-[200] bg-red-600 text-white py-3 px-4 text-center font-bold">
+        <p className="text-lg sm:text-xl md:text-2xl">
+          🚧 WEBSITE UNDER MAINTENANCE UNTIL 21/09/2025 🚧
+        </p>
+      </div>
+      
       <button className="absolute left-0 z-[100] top-1/2 w-14 h-48 -translate-y-1/2 opacity-0" onClick={(e) => {
         e.preventDefault();
         previousSlide();
