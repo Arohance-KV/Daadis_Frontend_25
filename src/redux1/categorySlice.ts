@@ -84,7 +84,7 @@ const initialState: CategoryState = {
 };
 
 // Base URL - you can replace {{local}} with your actual API base URL
-const BASE_URL = "https://daadis-server.onrender.com"; // e.g., 'http://localhost:5000' or 'https://api.yourdomain.com'
+const BASE_URL = import.meta.env.VITE_BASE_URL; // e.g., 'http://localhost:5000' or 'https://api.yourdomain.com'
 
 // API Helper function
 const apiCall = async (url: string, options: RequestInit = {}) => {

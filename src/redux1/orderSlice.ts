@@ -141,7 +141,7 @@ const initialState: OrderState = {
   limit: 10,
 };
 
-const BASE_URL = 'https://daadis-server.onrender.com';
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const getToken = () => localStorage.getItem('accessToken');
 const getHeaders = (): HeadersInit => ({

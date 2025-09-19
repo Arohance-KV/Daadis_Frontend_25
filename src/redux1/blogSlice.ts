@@ -47,7 +47,7 @@ const initialState: BlogsState = {
   error: null,
 };
 
-const BASE_URL = 'https://daadis-server.onrender.com';
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const apiCall = async (url: string, options: RequestInit = {}) => {
   const response = await fetch(`${BASE_URL}${url}`, {

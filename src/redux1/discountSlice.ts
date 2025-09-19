@@ -164,7 +164,7 @@ const initialState: DiscountState = {
 };
 
 // Base URL - Updated with your provided URL
-const BASE_URL = 'https://daadis-server.onrender.com';
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 // Helper function to get auth token
 const getToken = (): string | null => {
