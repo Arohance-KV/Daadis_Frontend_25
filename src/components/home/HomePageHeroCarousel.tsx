@@ -484,7 +484,7 @@ export const HomePageHeroCarousel = ({
       {/* Maintenance Banner */}
       <div className="absolute top-0 left-0 right-0 z-[200] bg-red-600 text-white py-3 px-4 text-center font-bold">
         <p className="text-lg sm:text-xl md:text-2xl">
-          🚧 WEBSITE UNDER MAINTENANCE UNTIL 21/09/2025 🚧
+          🚧 WEBSITE UNDER MAINTENANCE UNTIL FURTHER NOTICE 🚧
         </p>
       </div>
       
