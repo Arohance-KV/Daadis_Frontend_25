@@ -355,7 +355,7 @@ export const HomePageNavBar = () => {
 
             {/* Logo */}
             <Link className="ml-[100px]" to={"/"}>
-                <img className="h-20" src="/logo.svg" />
+                <img className="h-20" src="/logo.png" />
             </Link>
 
             <div className="justify-between gap-4 items-center flex flex-1">

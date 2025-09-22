@@ -227,6 +227,18 @@ export const CategoriesPage = () => {
   const [currentCategory, setCurrentCategory] = useState(name || "all");
   const [mobileDropdownOpen, setMobileDropdownOpen] = useState(false);
 
+  // Function to sort products - in-stock first, out-of-stock last
+  const sortProductsByStock = (productsArray: Product[]) => {
+    return [...productsArray].sort((a, b) => {
+      // If 'a' is in stock and 'b' is out of stock, 'a' should come first
+      if (a.stock > 0 && b.stock === 0) return -1;
+      // If 'a' is out of stock and 'b' is in stock, 'b' should come first
+      if (a.stock === 0 && b.stock > 0) return 1;
+      // If both have same stock status, maintain original order
+      return 0;
+    });
+  };
+
   useEffect(() => {
     if (categories.length === 0) {
       dispatch(getAllCategories());
@@ -244,11 +256,16 @@ export const CategoriesPage = () => {
   }, [name, dispatch]);
 
   useEffect(() => {
+    let productsToSort;
     if (currentCategory === "all") {
-      setProducts(allProducts);
+      productsToSort = allProducts;
     } else {
-      setProducts(categoryProducts);
+      productsToSort = categoryProducts;
     }
+    
+    // Sort products to show in-stock first, out-of-stock last
+    const sortedProducts = productsToSort ? sortProductsByStock(productsToSort) : [];
+    setProducts(sortedProducts);
   }, [allProducts, categoryProducts, currentCategory]);
 
   if (categoriesLoading) {

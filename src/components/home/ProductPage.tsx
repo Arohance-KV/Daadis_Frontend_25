@@ -1,5 +1,5 @@
 // ProductPage.tsx
-import { ChevronLeft, LucideHeart, LucideImageOff, ShoppingCart, Trash2, Loader2 } from "lucide-react";
+import { ChevronLeft, LucideHeart, LucideImageOff, ShoppingCart, Trash2, Loader2, AlertTriangle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
@@ -19,7 +19,7 @@ export const ProductPage = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
-  ;
+  
   const loading = useSelector(selectProductLoading);
   const productData = useSelector(selectCurrentProduct);
   const cartItems = useSelector((state: RootState) => state.cart.items);
@@ -38,6 +38,9 @@ export const ProductPage = () => {
   const [api] = useState<CarouselApi | undefined>(undefined);
   const [, setCurrent] = useState(0);
   const [, setCount] = useState(0);
+
+  // Check if product is out of stock
+  const isOutOfStock = productData?.stock === 0 || productData?.stock === undefined || productData?.stock < 1;
 
   useEffect(() => {
     if (id) {
@@ -66,7 +69,6 @@ export const ProductPage = () => {
     setSelectedIndex(0);
   }, [productData]);
 
-
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -91,18 +93,30 @@ return (
                 </div>
                 <div className="flex flex-col items-center w-full sm:px-8">
                   {/* Main Product Image */}
-                  <div className="w-full flex justify-center mb-4">
+                  <div className="w-full flex justify-center mb-4 relative">
                     {images.length > 0 ? (
-                      <img
-                        src={images[selectedIndex]}
-                        alt={`Product Image ${selectedIndex + 1}`}
-                        className="rounded-md object-contain shadow-lg"
-                        style={{
-                          width: "530px",
-                          height: "420px",
-                          borderRadius: "1rem"
-                        }}
-                      />
+                      <>
+                        <img
+                          src={images[selectedIndex]}
+                          alt={`Product Image ${selectedIndex + 1}`}
+                          className={cn(
+                            "rounded-md object-contain shadow-lg transition-all duration-200",
+                            isOutOfStock && "grayscale opacity-70"
+                          )}
+                          style={{
+                            width: "530px",
+                            height: "420px",
+                            borderRadius: "1rem"
+                          }}
+                        />
+                        {isOutOfStock && (
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="bg-red-500 text-white px-4 py-2 rounded-lg font-semibold shadow-lg">
+                              OUT OF STOCK
+                            </div>
+                          </div>
+                        )}
+                      </>
                     ) : (
                       <div className="bg-gray-300 rounded-md w-[350px] h-[350px] flex justify-center items-center">
                         <LucideImageOff className="" />No product images present
@@ -120,10 +134,11 @@ return (
                           alt={`Thumbnail ${idx + 1}`}
                           onClick={() => setSelectedIndex(idx)}
                           className={cn(
-                            "h-16 w-16 object-cover cursor-pointer rounded border",
+                            "h-16 w-16 object-cover cursor-pointer rounded border transition-all duration-200",
                             idx === selectedIndex
                               ? "border-yellow-400 shadow-md"
-                              : "border-gray-200"
+                              : "border-gray-200",
+                            isOutOfStock && "grayscale opacity-70"
                           )}
                           style={{
                             boxShadow: idx === selectedIndex ? "0 0 0 2px #facc15" : undefined
@@ -142,6 +157,37 @@ return (
                         <span className="text-lg text-gray-500 font-sans">{productData?.weight ? productData?.weight?.number + productData?.weight?.unit : <Skeleton className="h-5 w-20" />}</span>
                         <span className="text-lg ">{productData?.price ? "₹" + productData?.price : <Skeleton className="h-5 w-14" />}</span>
                     </div>
+                    
+                    {/* Stock Status Display */}
+                    <div className="flex items-center gap-2 mt-2">
+                      {productData?.stock !== undefined ? (
+                        <div className={cn(
+                          "flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium",
+                          isOutOfStock 
+                            ? "bg-red-100 text-red-700 border border-red-200" 
+                            : productData.stock < 10 
+                              ? "bg-orange-100 text-orange-700 border border-orange-200"
+                              : "bg-green-100 text-green-700 border border-green-200"
+                        )}>
+                          {isOutOfStock ? (
+                            <>
+                              <AlertTriangle className="w-4 h-4" />
+                              <span>Out of Stock</span>
+                            </>
+                          ) : productData.stock < 10 ? (
+                            <>
+                              <AlertTriangle className="w-4 h-4" />
+                              <span>Only {productData.stock} left</span>
+                            </>
+                          ) : (
+                            <span>In Stock ({productData.stock} available)</span>
+                          )}
+                        </div>
+                      ) : (
+                        <Skeleton className="h-6 w-24" />
+                      )}
+                    </div>
+
                     {productData?.description !== "" && (
                         <h3 className="font-sans text-gray-500 ">
                             {productData?.description ? productData?.description : <Skeleton className="h-4 w-full" />}
@@ -151,7 +197,7 @@ return (
                 <div className="sm:grid sm:w-[500px] flex sm:grid-cols-6 justify-center items-center flex-row sm:grid-rows-2 gap-10 sm:gap-2">
                     {productData?._id ? (
                         <Button
-                            disabled={cartLoading}
+                            disabled={cartLoading || isOutOfStock}
                             onClick={async (e) => {
                                 e.preventDefault();
                                 
@@ -159,6 +205,12 @@ return (
                                 if (!isAuthenticated) {
                                     toast.error("Please login to add items to cart");
                                     navigate('/auth');
+                                    return;
+                                }
+
+                                // Check if product is out of stock
+                                if (isOutOfStock) {
+                                    toast.error("This product is currently out of stock");
                                     return;
                                 }
                                 
@@ -191,10 +243,19 @@ return (
                                 return toast.success("Product added to cart successfully!", { className: "font-[quicksand]", icon: <ToastSuccess /> });
                             }}
                             variant={"ghost"}
-                            className={cn("flex col-span-5 row-span-1 justify-center items-center gap-2 text-lg", cartLoading && `bg-gray-100`)}
+                            className={cn(
+                              "flex col-span-5 row-span-1 justify-center items-center gap-2 text-lg transition-all duration-200",
+                              cartLoading && `bg-gray-100`,
+                              isOutOfStock && `bg-gray-100 text-gray-400 cursor-not-allowed opacity-60`
+                            )}
                         >
-                            {isInCart ? "- Remove from cart " : "+ Add to cart "}
-                            <ShoppingCart className="stroke-1" />
+                            {isOutOfStock 
+                              ? "Out of Stock" 
+                              : isInCart 
+                                ? "- Remove from cart " 
+                                : "+ Add to cart "
+                            }
+                            <ShoppingCart className={cn("stroke-1", isOutOfStock && "stroke-gray-400")} />
                         </Button>
                     ) : (
                         <Skeleton className="row-span-1 col-span-5" />
