@@ -229,6 +229,7 @@ export const CategoriesPage = () => {
 
   // Function to sort products - in-stock first, out-of-stock last
   const sortProductsByStock = (productsArray: Product[]) => {
+    if (!productsArray || productsArray.length === 0) return [];
     return [...productsArray].sort((a, b) => {
       // If 'a' is in stock and 'b' is out of stock, 'a' should come first
       if (a.stock > 0 && b.stock === 0) return -1;
@@ -238,6 +239,12 @@ export const CategoriesPage = () => {
       return 0;
     });
   };
+
+  // Create a combined products array for wishlist mapping
+  const allAvailableProducts = [...(allProducts || []), ...(categoryProducts || [])];
+  const uniqueProducts = allAvailableProducts.filter((product, index, self) => 
+    index === self.findIndex(p => p._id === product._id)
+  );
 
   useEffect(() => {
     if (categories.length === 0) {
@@ -416,7 +423,7 @@ export const CategoriesPage = () => {
                   product={product}
                   currentCart={cartItems}
                   currentWishList={wishlistItems
-                    .map(item => allProducts.find(p => p._id === item.product))
+                    .map(item => uniqueProducts.find(p => p._id === item.product))
                     .filter((p): p is Product => !!p)
                   }
                 />
