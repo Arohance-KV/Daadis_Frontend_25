@@ -597,13 +597,6 @@ const ProfilePage: React.FC = () => {
                                               Save Addresses
                                           </Button>
                                       </div>
-                                        <Button 
-                                            onClick={handleContinueToCheckout} 
-                                            className="w-full mt-4"
-                                            disabled={formData.addresses.length === 0}
-                                          >
-                                            Continue to Checkout
-                                        </Button>
                                   </div>
                               ) : (
                                   <div className="space-y-3">
@@ -632,6 +625,13 @@ const ProfilePage: React.FC = () => {
                                   </div>
                               )}
                           </CardContent>
+                          <Button 
+                            onClick={handleContinueToCheckout} 
+                            className="w-full mt-4"
+                            disabled={formData.addresses.length === 0}
+                            >
+                            Continue to Checkout
+                          </Button>
                       </Card>
                   </div>
               )}
