@@ -596,14 +596,14 @@ const ProfilePage: React.FC = () => {
                                               <Save className="w-4 h-4 mr-2" />
                                               Save Addresses
                                           </Button>
-                                          <Button 
+                                      </div>
+                                        <Button 
                                             onClick={handleContinueToCheckout} 
                                             className="w-full mt-4"
                                             disabled={formData.addresses.length === 0}
                                           >
                                             Continue to Checkout
-                                          </Button>
-                                      </div>
+                                        </Button>
                                   </div>
                               ) : (
                                   <div className="space-y-3">
