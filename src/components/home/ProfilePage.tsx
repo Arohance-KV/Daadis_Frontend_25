@@ -627,7 +627,7 @@ const ProfilePage: React.FC = () => {
                           </CardContent>
                           <Button 
                             onClick={handleContinueToCheckout} 
-                            className="w-full mt-4"
+                            className="w-fit mt-4 items-center flex"
                             disabled={formData.addresses.length === 0}
                             >
                             Continue to Checkout
