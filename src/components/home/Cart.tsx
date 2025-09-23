@@ -280,22 +280,22 @@ export const Cart: React.FC = () => {
 
   const handleCheckout = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    console.log("Checkout initiated");
+    //console.log("Checkout initiated");
 
     if (!user) {
       toast.error("Please login to proceed", { icon: <ToastFaliure /> });
-      console.log("User not logged in.");
+      //console.log("User not logged in.");
       return;
     }
     if (!user.phoneNumber) {
       toast.error("Please add your phone number");
-      console.log("User phone number missing, redirecting to shipping.");
+      //console.log("User phone number missing, redirecting to shipping.");
       navigate("/profile");
       return;
     }
     if (!defaultAddress || !defaultAddress.city) {
       toast.error("Please add your shipping address");
-      console.log("User shipping address missing, redirecting to shipping.");
+      //console.log("User shipping address missing, redirecting to shipping.");
       navigate("/profile");
       return;
     }
@@ -320,24 +320,24 @@ export const Cart: React.FC = () => {
         discountAmount: discountAmount, // Optional but recommended
         couponCode: couponCode,         // Optional, to identify applied discount
       };
-      console.log("Order payload:", orderPayload);
+      //console.log("Order payload:", orderPayload);
       // Create order
       const orderRes = await dispatch(createOrder(orderPayload)).unwrap();
-      console.log("Order creation response:", orderRes);
+      //console.log("Order creation response:", orderRes);
       const { orderId } = orderRes.data;
       if (!orderId) throw new Error("Failed to get order ID");
       const paymentRes = await dispatch(
         initiatePayment({ orderId, method: "razorpay" })
       ).unwrap();
-      console.log("Payment initiation response:", paymentRes);
+      //console.log("Payment initiation response:", paymentRes);
       const paymentData = paymentRes.data || paymentRes;
 
-      console.log("=== PAYMENT DATA DEBUG ===");
-      console.log("Full paymentData:", paymentData);
-      console.log("paymentData.order:", paymentData.order);
-      console.log("paymentData.order.id:", paymentData.order.id);
-      console.log("paymentData.payment.notes:", paymentData.payment.notes);
-      console.log("========================");
+      //console.log("=== PAYMENT DATA DEBUG ===");
+      //console.log("Full paymentData:", paymentData);
+      //console.log("paymentData.order:", paymentData.order);
+      //console.log("paymentData.order.id:", paymentData.order.id);
+      //console.log("paymentData.payment.notes:", paymentData.payment.notes);
+      //console.log("========================");
 
       const order = paymentData.payment;
 
@@ -356,7 +356,7 @@ export const Cart: React.FC = () => {
       razorpayOrderId = paymentData.payment.razorpayOrderId;
     }
 
-    console.log("Final order ID for Razorpay:", razorpayOrderId);
+    //console.log("Final order ID for Razorpay:", razorpayOrderId);
 
       const options = {
         key: paymentData.key,
@@ -367,12 +367,12 @@ export const Cart: React.FC = () => {
         image: "/logo.svg",
         order_id:  paymentData.payment.notes?.razorpayOrder?.id,
         handler: async (response: RazorpayPaymentData) => {
-          console.log("razorpay_order_id:", response.razorpay_order_id);
-          console.log("razorpay_payment_id:", response.razorpay_payment_id);
-          console.log("razorpay_signature:", response.razorpay_signature);
+          //console.log("razorpay_order_id:", response.razorpay_order_id);
+          //console.log("razorpay_payment_id:", response.razorpay_payment_id);
+          //console.log("razorpay_signature:", response.razorpay_signature);
 
           if (!response.razorpay_order_id || !response.razorpay_payment_id || !response.razorpay_signature) {
-            console.error("Missing Razorpay fields:", response);
+            //console.error("Missing Razorpay fields:", response);
             toast.error("Payment verification failed - incomplete data");
             return;
           }
@@ -390,7 +390,7 @@ export const Cart: React.FC = () => {
           navigate("/profile");
         } catch (error) {
           const err = error as Error;
-          console.error("Payment verification error:", err);
+          //console.error("Payment verification error:", err);
           toast.error(err.message || "Payment verification failed");
         }
       },
@@ -403,22 +403,22 @@ export const Cart: React.FC = () => {
         modal: {
           ondismiss: () => {
             toast.info("Payment cancelled");
-            console.log("Payment popup dismissed.");
+            //console.log("Payment popup dismissed.");
           }
         }
       };
 
-      console.log("Razorpay options object:", options);
+      //console.log("Razorpay options object:", options);
 
       const rzp = new (window as any).Razorpay(options);
       rzp.on("payment.failed", (response: any) => {
-        console.error("Payment failed:", response.error);
+        //console.error("Payment failed:", response.error);
         toast.error(`Payment failed: ${response.error.description || "Unknown error"}`);
       });
   
       rzp.open();
     } catch (error) {
-    console.error("Checkout error:", error);
+    //console.error("Checkout error:", error);
     if (error instanceof Error) {
       toast.error(error.message);
     } else {
