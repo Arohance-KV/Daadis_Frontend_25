@@ -214,14 +214,12 @@ export const Cart: React.FC = () => {
   const discountFetchError = useSelector(selectDiscountError);
   const removeDiscountLoading = useSelector(selectRemoveDiscountLoading);
   
-  const shippingCharge = 10; // Rs 10 fixed
-  const gstPercent = 0.18; // 18%
+  const shippingCharge = 50; // Rs 10 fixed
   
   const subtotal = cartTotals?.total || 0;
   const discountAmount = localDiscountValue;
   const calcTotalBeforeTax = subtotal - discountAmount;
-  const gstAmount = Math.round((calcTotalBeforeTax + shippingCharge) * gstPercent);
-  const grandTotal = calcTotalBeforeTax + shippingCharge + gstAmount;
+  const grandTotal = calcTotalBeforeTax + shippingCharge;
 
   useEffect(() => {
     dispatch(fetchCartDetails());
@@ -543,10 +541,6 @@ export const Cart: React.FC = () => {
                 <div className="flex justify-between text-gray-600">
                   <span>Shipping:</span>
                   <span>₹{shippingCharge.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between text-gray-600">
-                  <span>GST (18%):</span>
-                  <span>₹{gstAmount.toFixed(2)}</span>
                 </div>
                 <hr className="border-gray-200" />
                 <div className="flex justify-between text-lg font-bold text-gray-800">

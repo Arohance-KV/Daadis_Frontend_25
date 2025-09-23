@@ -232,9 +232,18 @@ const ProfilePage: React.FC = () => {
     navigate('/auth');
     return null;
   }
+  // Add this function
+  const handleContinueToCheckout = () => {
+    if (formData.addresses.length === 0) {
+      toast.error('Please add at least one address before proceeding to checkout');
+      return;
+    }
+    navigate('/cart'); // Adjust the path as needed
+  };
 
   return (
-    <><HomePageNavBar />
+    <>
+    <HomePageNavBar />
     <div className="min-h-screen bg-gray-50 pt-20 px-4">
           <div className="max-w-6xl mx-auto">
               {/* Header */}
@@ -586,6 +595,13 @@ const ProfilePage: React.FC = () => {
                                           >
                                               <Save className="w-4 h-4 mr-2" />
                                               Save Addresses
+                                          </Button>
+                                          <Button 
+                                            onClick={handleContinueToCheckout} 
+                                            className="w-full mt-4"
+                                            disabled={formData.addresses.length === 0}
+                                          >
+                                            Continue to Checkout
                                           </Button>
                                       </div>
                                   </div>
