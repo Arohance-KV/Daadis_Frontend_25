@@ -196,32 +196,40 @@ const AboutUs: React.FC = () => {
         {/* Main Content */}
         <div className="space-y-6 text-black leading-relaxed">
           <p className="text-lg">
-            Daadi's is a leading ethnic food brand which provides traditional foods in convenient packaged form. Started in 2008, Daadi's is part of the 30 year old Meghraj Group. Daadi's khakhras are healthy and are hygienically manufactured in a state of art facility in Bengaluru.
+            Daadi’s is a leading ethnic food brand that brings the taste of tradition to your table in a modern, convenient way. Started in 2008, Daadi’s is part of the <b>40-year-old Meghraj Group</b>, known for its commitment to quality and trust.
           </p>
-
           <p className="text-lg">
-            Daadi's currently manufacturers Traditional Range of Khakhra (Golden Wheat Crisps), Wellness Range Khakhra (Cereal Khakhra), Mobile Range Khakhra (Pocket sized Khakhra), Bhakhri (reminiscent of the Mathri (North India) and the Nippattu or Thatte (South India). Miniatures Range of khakhra (On the go snack), Besan Laddoo (A preparation of pure cow ghee, besan & cardamom), Chutney Powder (Fresh Chutney Powders) & Premium Delight (Gift box - assortment of Daadi's products for all festivals and events). All our products are made using age-old traditional recipes and presented to today's world in a very modern and convenient form.
+            Daadi’s products are healthy and hygienically manufactured in a state-of-the-art facility in Bengaluru, ensuring every bite delivers taste, purity, and nutrition.
           </p>
 
+          <p className="text-lg">We currently offer:
+          <ul className="text-lg font-bold list-disc pl-6">
+            <li>Traditional Range of Khakhra</li>
+            <li>Mobile Khakhra</li>
+            <li>Bhakhri & Namkeen</li>
+            <li>Indian Sweets in Pure Ghee like Kaju Katli, Motichoor Laddoo, Besan Laddoo</li>
+            <li>Premium Delight – an assortment gift box perfect for festivals and special occasions</li>
+          </ul>
+          </p>
           {/* Highlighted Quote 1 */}
           <blockquote className="bg-yellow-100 border-l-4 border-yellow-400 p-6 my-8">
             <p className="text-lg font-semibold text-black italic">
-              All our products are free from preservatives and artificial colours and flavours.
+              All our products are crafted using age-old recipes and presented in a way that suits today’s fast-paced lifestyle <b>— free from preservatives, artificial colours, and flavours.</b>
             </p>
           </blockquote>
 
           <p className="text-lg">
-            In today's world where time is sparse you can meet your immediate culinary desires with Daadi's.
+            In a world where time is scarce, Daadi’s helps you meet your immediate culinary cravings — quickly, healthily, and deliciously.
           </p>
 
           <p className="text-lg">
-            Having a strong presence in South India, Daadi's is aggressively planning to spread to other states and also quickly planning to explore new flavors by introducing new products. Daadi's is available in all leading supermarkets and is banking on its wide network to increase its market.
+            With a strong presence across India and availability in leading supermarkets and quick-commerce platforms, Daadi’s is expanding rapidly to international markets and innovating with new flavours and product lines.
           </p>
 
           {/* Highlighted Quote 2 */}
           <blockquote className="bg-yellow-100 border-l-4 border-yellow-400 p-6 my-8">
             <p className="text-lg font-semibold text-black italic">
-              The makers of Daadi's Khakhra are the largest manufacturers of Khakhra in South India.
+              The makers of Daadi’s are among the <b>largest Khakhra manufacturers in India</b>, a testament to our scale and trust.
             </p>
           </blockquote>
 
@@ -236,7 +244,7 @@ const AboutUs: React.FC = () => {
               <div className="bg-yellow-50 p-6 rounded-lg border border-yellow-200">
                 <h3 className="text-xl font-bold text-black mb-3">Vision</h3>
                 <p className="text-black">
-                  Our vision is to provide our consumers a convenient and wholesome eating experience with a range of traditional, healthy, tasty and innovative eatables, prepared with natural ingredients and flavours in a hygienic environment
+                  To provide consumers a convenient and wholesome eating experience with a range of traditional, healthy, tasty, and innovative eatables, prepared with natural ingredients and flavours in a hygienic environment.
                 </p>
               </div>
 
@@ -252,7 +260,7 @@ const AboutUs: React.FC = () => {
               <div className="bg-yellow-50 p-6 rounded-lg border border-yellow-200">
                 <h3 className="text-xl font-bold text-black mb-3">Values</h3>
                 <p className="text-black">
-                  We value integrity, respect for stakeholders, creativity and innovation.
+                  We value <b>integrity, respect for stakeholders</b>, and encourage <b> creativity and innovation</b> in everything we do.
                 </p>
               </div>
             </div>
