@@ -31,6 +31,77 @@ import {
 
 import { RootState, AppDispatch } from "../../redux1/store";
 
+// Lazy Image Component for performance optimization
+const LazyImage = ({ src, alt, className, overlayContent }: { 
+  src: string; 
+  alt: string; 
+  className?: string;
+  overlayContent?: React.ReactNode;
+}) => {
+  const [imageSrc, setImageSrc] = useState<string>("");
+  const [imageRef, setImageRef] = useState<HTMLDivElement | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setImageSrc(src);
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.01, rootMargin: "50px" }
+    );
+
+    if (imageRef) {
+      observer.observe(imageRef);
+    }
+
+    return () => {
+      if (imageRef) {
+        observer.unobserve(imageRef);
+      }
+    };
+  }, [imageRef, src]);
+
+  return (
+    <div ref={setImageRef} className="relative w-full h-full">
+      {isLoading && !imageSrc && (
+        <div className="absolute inset-0 bg-gray-200 animate-pulse rounded-t-[inherit] flex items-center justify-center">
+          <ImageOff className="w-8 h-8 text-gray-400" />
+        </div>
+      )}
+      
+      {imageSrc && (
+        <>
+          <img
+            src={imageSrc}
+            alt={alt}
+            className={className}
+            onLoad={() => setIsLoading(false)}
+            onError={() => {
+              setIsLoading(false);
+              setHasError(true);
+            }}
+            style={{ display: isLoading ? 'none' : 'block' }}
+          />
+          
+          {hasError && (
+            <div className="absolute inset-0 bg-gray-200 flex items-center justify-center rounded-t-[inherit]">
+              <ImageOff className="w-8 h-8 text-gray-400" />
+            </div>
+          )}
+        </>
+      )}
+      
+      {overlayContent}
+    </div>
+  );
+};
+
 const ProductCard = ({
   product,
   currentCart,
@@ -135,72 +206,84 @@ const ProductCard = ({
 
   return (
     <div className={cn(
-      "max-w-[250px] w-full col-span-1 justify-self-center relative rounded-lg shadow-xl",
+      "w-full h-full flex flex-col rounded-lg shadow-xl",
       isOutOfStock && "opacity-75"
     )}>
-      {/* Product Image with Stock Overlay */}
-      <div className="relative">
-        <img
+      {/* Product Image with Stock Overlay - Fixed aspect ratio */}
+      <div className="relative aspect-square w-full">
+        <LazyImage
           src={product.images[0] ?? ""}
           alt={product.name}
           className={cn(
-            "border-none rounded-t-[inherit] object-cover w-full h-auto aspect-square",
+            "border-none rounded-t-[inherit] object-cover w-full h-full",
             isOutOfStock && "grayscale"
           )}
+          overlayContent={
+            isOutOfStock && (
+              <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-t-[inherit]">
+                <span className="text-white font-bold sm:text-lg text-sm bg-red-500 px-2 sm:px-3 py-1 rounded">
+                  OUT OF STOCK
+                </span>
+              </div>
+            )
+          }
         />
-        
-        {/* Out of Stock Overlay */}
-        {isOutOfStock && (
-          <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-t-[inherit]">
-            <span className="text-white font-bold text-lg bg-red-500 px-3 py-1 rounded">
-              OUT OF STOCK
-            </span>
-          </div>
-        )}
       </div>
 
-      <div className="w-full flex flex-col gap-2 p-4 h-1/3 rounded-b-[inherit]">
-        <h3 className="font-[quicksand] text-xl">{product.name}</h3>
-        <h6 className="text-gray-600">{product.weight.number}{product.weight.unit}</h6>
-        <h6 className="">₹{product.price}</h6>
+      {/* Content section with flex-grow to maintain consistent height */}
+      <div className="w-full flex flex-col gap-2 p-3 sm:p-4 flex-grow rounded-b-[inherit]">
+        {/* Product name with truncation and fixed height */}
+        <h3 className="font-[quicksand] text-base sm:text-xl line-clamp-2 min-h-[2.5rem] sm:min-h-[3rem]">
+          {product.name}
+        </h3>
+        
+        {/* Weight and price */}
+        <h6 className="text-gray-600 text-sm sm:text-base">
+          {product.weight.number}{product.weight.unit}
+        </h6>
+        <h6 className="text-sm sm:text-base font-semibold">₹{product.price}</h6>
         
         {/* Stock Status - Only show if out of stock */}
         {isOutOfStock && (
-          <div className="text-sm">
+          <div className="text-xs sm:text-sm">
             <span className="text-red-500 font-medium">Out of Stock</span>
           </div>
         )}
 
-        <Button
-          className={cn(
-            "flex justify-center items-center gap-4 w-full",
-            isOutOfStock && "opacity-50 cursor-not-allowed"
-          )}
-          variant={isOutOfStock ? "secondary" : "ghost"}
-          onClick={handleCartToggle}
-          disabled={isCartLoading || isOutOfStock}
-        >
-          {isCartLoading ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
-          ) : isOutOfStock ? (
-            "Out of Stock"
-          ) : isInCart ? (
-            "- Remove from cart"
-          ) : (
-            "+ Add to cart"
-          )}
-          <ShoppingCart />
-        </Button>
+        {/* Button with consistent positioning */}
+        <div className="mt-auto">
+          <Button
+            className={cn(
+              "flex justify-center items-center gap-2 sm:gap-4 w-full text-xs sm:text-sm",
+              isOutOfStock && "opacity-50 cursor-not-allowed"
+            )}
+            variant={isOutOfStock ? "secondary" : "ghost"}
+            onClick={handleCartToggle}
+            disabled={isCartLoading || isOutOfStock}
+          >
+            {isCartLoading ? (
+              <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 animate-spin" />
+            ) : isOutOfStock ? (
+              "Out of Stock"
+            ) : isInCart ? (
+              <span className="truncate">- Remove from cart</span>
+            ) : (
+              <span className="truncate">+ Add to cart</span>
+            )}
+            <ShoppingCart className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+          </Button>
+        </div>
       </div>
       
+      {/* Wishlist button */}
       <button 
         onClick={handleWishToggle}
-        className="absolute top-[3%] right-[5%]"
+        className="absolute top-[3%] right-[5%] z-10"
         disabled={isWishLoading}
       >
         <Heart 
           className={cn(
-            "hover:stroke-red-500 hover:scale-110 transition-all duration-150",
+            "w-5 h-5 sm:w-6 sm:h-6 hover:stroke-red-500 hover:scale-110 transition-all duration-150",
             isInWishlist && "stroke-red-500 fill-red-500",
             isWishLoading && "animate-pulse"
           )}
@@ -289,7 +372,7 @@ export const CategoriesPage = () => {
     return category?.name ?? "Category";
   };
 
-  const ALL_PRODUCTS_IMAGE_URL = "https://res.cloudinary.com/dmrgscauc/image/upload/v1756883051/banner_ha5rfq.png";
+  const ALL_PRODUCTS_IMAGE_URL = "https://res.cloudinary.com/dmrgscauc/image/upload/v1758780847/Untitled_design_7_dzo4vj.png";
 
   return (
     <div className="mt-[56px] font-[quicksand] flex w-full min-h-[calc(100vh-56px)]">
@@ -327,7 +410,7 @@ export const CategoriesPage = () => {
         </div>
       </section>
 
-      <section id="products" className="p-6 flex-1">
+      <section id="products" className="p-4 sm:p-6 flex-1">
         {/* Mobile Header with Back Button and Category Dropdown */}
         <div className="sm:hidden flex items-center justify-between mb-4">
           <Link to={"/"}>
@@ -391,17 +474,17 @@ export const CategoriesPage = () => {
         </Link>
 
         
-        {/* Category banner */}
+        {/* Category banner with lazy loading */}
         <div className="mb-6">
           {currentCategory === "all" ? (
-            <img
+            <LazyImage
               src={ALL_PRODUCTS_IMAGE_URL}
               alt="All Products Banner"
               className="w-full h-80 rounded object-cover"
             />
           ) : categories.find((cat) => cat._id === currentCategory)?.image ? (
-            <img
-              src={categories.find((cat) => cat._id === currentCategory)?.image}
+            <LazyImage
+              src={categories.find((cat) => cat._id === currentCategory)?.image || ""}
               alt={`${getCategoryName()} Banner`}
               className="w-full h-80 rounded object-cover"
             />
@@ -412,13 +495,17 @@ export const CategoriesPage = () => {
           )}
         </div>
 
-        {/* Products Grid */}
-        <div className="py-4 grid sm:grid-cols-4 lg:grid-cols-4 md:grid-cols-3 grid-cols-2 items-center gap-4 justify-center" id="product-list">
+        {/* Products Grid - Adjusted for consistent card sizes */}
+        <div className="py-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 auto-rows-fr" id="product-list">
           {!products && <Loader2 className="w-4 h-4 animate-spin" />}
           {products?.length === 0 && <p className="col-span-full text-center font-[quicksand] text-yellow-600 w-full h-full">No products under this category!</p>}
           {products?.map((product) => {
             return (
-              <Link key={product._id} to={`/product/${product._id}`} className="block hover:scale-105 transition-transform duration-200">
+              <Link 
+                key={product._id} 
+                to={`/product/${product._id}`} 
+                className="block hover:scale-105 transition-transform duration-200 h-full"
+              >
                 <ProductCard
                   product={product}
                   currentCart={cartItems}
