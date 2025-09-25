@@ -180,6 +180,12 @@ const ProductCard = ({
       navigate('/auth');
       return;
     }
+
+    // Prevent adding to wishlist if out of stock and not already in wishlist
+    if (isOutOfStock && !isInWishlist) {
+      toast.error("Cannot add out of stock product to wishlist");
+      return;
+    }
     
     setWishLoading(true);
     try {
