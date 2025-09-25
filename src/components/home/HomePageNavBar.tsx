@@ -376,7 +376,7 @@ export const HomePageNavBar = () => {
                         </PopoverTrigger>
                         <PopoverContent side="bottom" sideOffset={8} className="p-4 w-64">
                           <Button onClick={() => navigate('/auth')}>
-                            <LogIn className="mr-2" /> Login / Sign Up
+                            <LogIn className="mr-2" /> Google Login
                           </Button>
                         </PopoverContent>
                       </Popover>
