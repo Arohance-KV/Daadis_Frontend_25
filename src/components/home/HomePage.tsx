@@ -129,6 +129,20 @@ export const HomePage = () => {
       {/* Hero carousel */}
       <HomePageHeroCarousel />
 
+      {/* Responsive Image Section */}
+      <div className="w-full flex justify-center py-4 px-4">
+        <img
+          src="https://res.cloudinary.com/dmrgscauc/image/upload/v1758788174/Untitled_design_8_psjjq5.png"
+          alt="Featured content"
+          className="hidden sm:block rounded-[1.5rem] max-w-[88rem] w-full h-auto object-cover"
+        />
+        <img
+          src="https://res.cloudinary.com/dmrgscauc/image/upload/v1758788169/Untitled_design_9_gdlw6t.png" 
+          alt="Featured content"
+          className="block sm:hidden rounded-[1.5rem] max-w-sm w-full h-auto object-cover"
+        />
+      </div>
+
       {/* Products */}
       <HomeOurProducts />
 

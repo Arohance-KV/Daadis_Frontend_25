@@ -35,7 +35,7 @@ const SAMPLE_BANNERS: ISampleBanners[] = [
   },
   {
     _id: "3",
-    imageUrl: { url: "https://res.cloudinary.com/dthrjonaq/image/upload/f_auto,q_auto/v1732149002/daadis.in/banners/krpn16sdhwoetsedywbl.png", publicId: "banner3" },
+    imageUrl: { url: "https://res.cloudinary.com/dmrgscauc/image/upload/v1758798726/daadi_kaju_katli_ce6tz7.png", publicId: "banner3" },
     bannerName: "Kaju Katli",
     bannerText: "Kaju Katli",
     bannerType: "hero",
