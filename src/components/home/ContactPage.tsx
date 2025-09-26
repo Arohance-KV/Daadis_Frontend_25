@@ -36,11 +36,6 @@ export const ContactPage = () => {
             </section>
             <section id="contact" className="flex-1 font-[quicksand] gap-5 p-6 h-auto flex flex-col sm:flex-row sm:flex">
                 <div id="more-details" className="grid-cols-5 gap-4 p-4 rounded-lg grid sm:flex-[0.25] bg-gray-100/50 shadow-md">
-                    {/*<MapPin className="col-span-1" />
-                    <div className="col-span-4 flex flex-col gap-2">
-                        <h1 className="text-sm font-bold">Manufactured by:</h1>
-                        <p className="text-xs">Meghraj Food Processing India Pvt.Ltd (MFPIPL), Shed No.:03, Plot No.:322-A, Sy. No. 189, Bommasandra-Jigani Hobli, Industrial Area, Jigani Village, Jigani Hobli, Anekal Taluk, Bengaluru Urban, Karnataka - 562105 (India)</p>
-                    </div>*/}
                     <Mail className="col-span-1" />
                     <div className="col-span-4">
                         <a href="mailto:contact@meghrajgroup.com">contact@meghrajgroup.com</a>
@@ -49,10 +44,15 @@ export const ContactPage = () => {
                     <div className="col-span-4">
                         <a href="tel:+919886402902">+919886402902</a>
                     </div>
+                    <MapPin className="col-span-1" />
+                    <div className="col-span-4 flex flex-col gap-2">
+                        <h1 className="text-sm font-bold">Manufactured by (Unit-01):</h1>
+                        <p className="text-xs">Plot No 48, No.-179, Jigani Industrial Area, First phase, Anekal Taluk,<br />Bengaluru Urban, Karnataka-562106</p>
+                    </div>
                     <Store className="col-span-1" />
                     <div className="col-span-4 flex flex-col gap-2">
-                        <h1 className="text-sm font-bold">Manufactured by:</h1>
-                        <p className="text-xs">Meghraj Marketing Pvt Ltd, No.2006/A, 1st floor, South End E Main Road, 9th Block Jayanagar,<br />Bengaluru - 562106</p>
+                        <h1 className="text-sm font-bold">Manufactured by (Unit-02):</h1>
+                        <p className="text-xs">Shed No.:-03, Plot No:-322-A, Opposite:-HDFC Bank, Next to Indian Petrol Bunk, Bommasandra-Jigani<br /> link road, KIADB Industrial Area, Jigani, Anekal Taluk, Bengaluru Urban, Karnataka. - 560105</p>
                     </div>
                 </div>
                 <div id="contact-form" className="flex-[0.75] p-6 px-10 bg-gray-100/50 flex flex-col gap-4 rounded-lg shadow-md">

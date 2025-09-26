@@ -157,7 +157,7 @@ export const Footer = () => {
               <div>
                 <h3 className="font-bold text-gray-800 mb-6 text-lg">Info</h3>
                 <ul className="space-y-3">
-                  <li><a href="mailto:hello@dadis.com" className="text-gray-950 hover:-translate-y-1 transition-all duration-200 inline-block text-sm font-bold" style={{fontFamily: 'Poppins, sans-serif'}}>hello@dadis.com</a></li>
+                  <li><a href="mailto:contact@meghrajgroup.com" className="text-gray-950 hover:-translate-y-1 transition-all duration-200 inline-block text-sm font-bold" style={{fontFamily: 'Poppins, sans-serif'}}>contact@meghraj<br/>group.com</a></li>
                   <li><Link to="/privacy-policy" onClick={scrollToTop} className="text-gray-950 hover:-translate-y-1 transition-all duration-200 inline-block font-bold" style={{fontFamily: 'Poppins, sans-serif'}}>Privacy Policy</Link></li>
                   <li><Link to="/terms-and-conditions" onClick={scrollToTop} className="text-gray-950 hover:-translate-y-1 transition-all duration-200 inline-block font-bold" style={{fontFamily: 'Poppins, sans-serif'}}>Terms & Conditions</Link></li>
                 </ul>
