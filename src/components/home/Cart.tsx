@@ -573,7 +573,6 @@ export const Cart: React.FC = () => {
               <Button 
                 disabled={checkoutLoading || cartItems.length <= 0} 
                 className="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-3 text-base" 
-                onClick={handleCheckout}
               >
                 {checkoutLoading ? (
                   <>
