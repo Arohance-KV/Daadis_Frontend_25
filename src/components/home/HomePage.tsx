@@ -146,9 +146,9 @@ export const HomePage = () => {
       {/* Products */}
       <HomeOurProducts />
 
-      {/* Partners */}
-      <OurPartners />
-
+      {/* Partners 
+      <OurPartners />*/}
+      
       {/* Responsive Videos */}
       {/* ... your video section unchanged ... */}
       <div className="w-full p-4 md:p-10 home-page-carousel-container">
